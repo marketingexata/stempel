@@ -1,0 +1,2727 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StampClean</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Pola Transparan Checkerboard */
+        .bg-checkerboard {
+            background-color: #0f172a;
+            background-image: 
+                linear-gradient(45deg, #1e293b 25%, transparent 25%), 
+                linear-gradient(-45deg, #1e293b 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #1e293b 75%), 
+                linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .bg-checkerboard-light {
+            background-color: #f8fafc;
+            background-image: 
+                linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
+                linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+                linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+            background-size: 18px 18px;
+            background-position: 0 0, 0 9px, 9px -9px, -9px 0px;
+        }
+
+        /* Kustomisasi Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Kustomisasi Slider Range */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            background: #1e293b;
+            height: 6px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -5px;
+            background-color: #3b82f6;
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            transition: transform 0.1s ease, background-color 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background-color: #60a5fa;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        /* Hilangkan panah default details summary */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- HEADER & NAVIGASI 4 LANGKAH -->
+    <header class="border-b border-slate-800/80 bg-slate-900/95 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-[1640px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-900/40 border border-blue-400/30 shrink-0">
+                    <i data-lucide="stamp" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-base sm:text-lg tracking-tight text-white">StampClean <span class="text-blue-400">Studio Pro</span></h1>
+                        <span class="hidden xl:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                            4 langkah mudah pindahin stempel
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block">Crop Stempel Foto 1 &rarr; Bersihkan &amp; Samakan Pencahayaan Stempel di Foto 2 &rarr; Ekspor JPG/PNG/PDF</p>
+                </div>
+            </div>
+
+            <!-- Stepper Bar Interaktif (Langkah 1 - 4) -->
+            <nav class="flex items-center gap-1.5 sm:gap-2 bg-slate-950/90 p-1.5 rounded-2xl border border-slate-800 overflow-x-auto max-w-full">
+                <button type="button" data-step-nav="1" class="step-tab-btn flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-blue-600 text-white shadow">
+                    <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold">1</span>
+                    <span>Unggah 2 Foto</span>
+                </button>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600 shrink-0"></i>
+                <button type="button" data-step-nav="2" class="step-tab-btn flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[11px] font-bold">2</span>
+                    <span>Crop Foto 1</span>
+                </button>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600 shrink-0"></i>
+                <button type="button" data-step-nav="3" class="step-tab-btn flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[11px] font-bold">3</span>
+                    <span>Edit &amp; Preview Foto 2</span>
+                </button>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600 shrink-0"></i>
+                <button type="button" data-step-nav="4" class="step-tab-btn flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[11px] font-bold">4</span>
+                    <span>Unduh JPG / PNG / PDF</span>
+                </button>
+            </nav>
+
+            <!-- Demo Reload Button -->
+            <div class="flex items-center gap-2">
+                <button id="btnReloadDemo" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" title="Muat ulang sampel Foto 1 (SHIN CHITOSE) & Foto 2 (Dokumen Target)">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+                    <span class="hidden md:inline">Reset Sampel Demo</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-[1640px] w-full mx-auto p-3 sm:p-5 flex flex-col gap-5">
+
+        <!-- ======================================================================= -->
+        <!-- LANGKAH 1: UNGGAH 2 FILE FOTO (FOTO 1: DENGAN STEMPEL & FOTO 2: TARGET) -->
+        <!-- ======================================================================= -->
+        <section id="stepSection1" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl transition-all">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 font-bold text-sm flex items-center justify-center">1</span>
+                    <div>
+                        <h2 class="text-sm sm:text-base font-bold text-white">Langkah 1: Unggah 2 File Foto</h2>
+                        <p class="text-xs text-slate-400">Unggah <strong>Foto 1 (Foto dengan Stempel)</strong> untuk di-crop, dan <strong>Foto 2 (Foto Target Stempel)</strong> sebagai latar tujuan.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btnGoStep2From1" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 transition">
+                        <span>Lanjut ke Langkah 2: Crop Foto 1</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <!-- KARTU UNGGAH FOTO 1: FOTO DENGAN STEMPEL -->
+                <div id="dropZone1" class="relative group rounded-2xl border-2 border-dashed border-blue-500/40 hover:border-blue-400 bg-slate-950/70 p-4 sm:p-5 flex flex-col justify-between gap-4 transition">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+                                <i data-lucide="file-scan" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-mono uppercase tracking-wider text-blue-400 font-semibold">Foto 1 • Sumber Stempel</span>
+                                <h3 class="text-sm font-bold text-white">Foto dengan Stempel</h3>
+                                <p id="photo1Meta" class="text-xs text-slate-400">Sampel: Halaman Paspor SHIN CHITOSE A.P. (900 × 620 px)</p>
+                            </div>
+                        </div>
+                        <label for="inputPhoto1" class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow transition shrink-0">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Pilih Foto 1</span>
+                        </label>
+                        <input id="inputPhoto1" type="file" accept="image/*" class="hidden">
+                    </div>
+
+                    <!-- Thumbnail Preview Foto 1 -->
+                    <div class="relative h-44 sm:h-52 w-full rounded-xl bg-slate-900 border border-slate-800 overflow-hidden flex items-center justify-center">
+                        <canvas id="thumbCanvas1" class="max-h-full max-w-full object-contain"></canvas>
+                        <div class="absolute bottom-2 right-2 bg-slate-950/85 backdrop-blur px-2.5 py-1 rounded-lg border border-slate-700 text-[11px] text-slate-300 flex items-center gap-1.5">
+                            <i data-lucide="crop" class="w-3.5 h-3.5 text-blue-400"></i>
+                            <span>Akan di-crop pada Langkah 2</span>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                        <span>Seret &amp; lepas file gambar di kartu ini untuk mengganti Foto 1</span>
+                        <span class="text-emerald-400 font-medium flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Siap</span>
+                    </div>
+                </div>
+
+                <!-- KARTU UNGGAH FOTO 2: FOTO TARGET STEMPEL -->
+                <div id="dropZone2" class="relative group rounded-2xl border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 bg-slate-950/70 p-4 sm:p-5 flex flex-col justify-between gap-4 transition">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                                <i data-lucide="file-check-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 font-semibold">Foto 2 • Dokumen Tujuan</span>
+                                <h3 class="text-sm font-bold text-white">Foto Target Stempel</h3>
+                                <p id="photo2Meta" class="text-xs text-slate-400">Sampel: Halaman Dokumen Visa / Paspor Tujuan (920 × 640 px)</p>
+                            </div>
+                        </div>
+                        <label for="inputPhoto2" class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow transition shrink-0">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Pilih Foto 2</span>
+                        </label>
+                        <input id="inputPhoto2" type="file" accept="image/*" class="hidden">
+                    </div>
+
+                    <!-- Thumbnail Preview Foto 2 -->
+                    <div class="relative h-44 sm:h-52 w-full rounded-xl bg-slate-900 border border-slate-800 overflow-hidden flex items-center justify-center">
+                        <canvas id="thumbCanvas2" class="max-h-full max-w-full object-contain"></canvas>
+                        <div class="absolute bottom-2 right-2 bg-slate-950/85 backdrop-blur px-2.5 py-1 rounded-lg border border-slate-700 text-[11px] text-slate-300 flex items-center gap-1.5">
+                            <i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-400"></i>
+                            <span>Target Preview di Langkah 3</span>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                        <span>Seret &amp; lepas file gambar di kartu ini untuk mengganti Foto 2</span>
+                        <span class="text-emerald-400 font-medium flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Siap</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================================= -->
+        <!-- LANGKAH 2: CROPPING FOTO 1 KE BAGIAN YANG ADA STEMPELNYA                -->
+        <!-- ======================================================================= -->
+        <section id="stepSection2" class="hidden bg-slate-900/95 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 font-bold text-sm flex items-center justify-center">2</span>
+                    <div>
+                        <h2 class="text-sm sm:text-base font-bold text-white">Langkah 2: Cropping Foto 1 pada Bagian Stempel</h2>
+                        <p class="text-xs text-slate-400">Geser kotak potong biru pada <strong>Foto 1</strong> agar hanya menyisakan bagian yang ada stempelnya saja.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="btnResetCropBox" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                        <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-blue-400"></i>
+                        <span>Fokus Area Stempel</span>
+                    </button>
+                    <button id="btnApplyCropToStep3" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/40 transition">
+                        <i data-lucide="scissors" class="w-4 h-4"></i>
+                        <span>Potong &amp; Masukkan ke Preview Foto 2 &rarr;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                <!-- Kanvas Interaktif Cropping Foto 1 (8 Kolom) -->
+                <div class="lg:col-span-8 flex flex-col gap-2">
+                    <div id="cropViewport" class="relative w-full h-[420px] sm:h-[500px] rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center select-none shadow-inner">
+                        <canvas id="cropCanvas" class="block cursor-crosshair"></canvas>
+                        <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded-xl border border-slate-700 text-[11px] text-slate-300 font-mono pointer-events-none">
+                            Area Crop: <span id="cropDimLabel" class="text-blue-400 font-semibold">-- × -- px</span> (Tarik sudut/sisi untuk mengubah ukuran, atau tarik di dalam kotak untuk menggeser)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Hasil Akhir Cropping Foto 1 (4 Kolom) -->
+                <div class="lg:col-span-4 bg-slate-950 border border-slate-800 rounded-2xl p-4 flex flex-col gap-4">
+                    <div>
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-emerald-400 font-semibold">Hasil Akhir Foto 1</span>
+                        <h3 class="text-sm font-bold text-white mt-0.5">Hanya Menyisakan Bagian yang Di-Crop</h3>
+                        <p class="text-xs text-slate-400 mt-1">Bagian luar kotak otomatis dibuang. Potongan stempel di bawah ini langsung dikirim ke Preview Foto ke-2.</p>
+                    </div>
+
+                    <!-- Preview Hasil Crop Saja -->
+                    <div class="h-48 w-full rounded-xl bg-checkerboard border border-slate-800 p-3 flex items-center justify-center overflow-hidden">
+                        <canvas id="croppedResultPreviewCanvas" class="max-h-full max-w-full object-contain rounded shadow-lg"></canvas>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 space-y-2 text-xs text-slate-300">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Koordinat (X, Y):</span>
+                            <span id="cropCoordText" class="font-mono text-white">0, 0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Ukuran Potongan:</span>
+                            <span id="cropSizeText" class="font-mono text-emerald-400">0 × 0 px</span>
+                        </div>
+                    </div>
+
+                    <button id="btnApplyCropToStep3Side" type="button" class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-900/30 transition">
+                        <span>Lanjut Edit Stempel di Preview Foto 2</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================================= -->
+        <!-- LANGKAH 3 & 4: EDITING PEMBERSIH STEMPEL DI PREVIEW FOTO KE-2 & EKSPOR  -->
+        <!-- ======================================================================= -->
+        <section id="stepSection3" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+            <!-- KOLOM KIRI / TENGAH: KANVAS PREVIEW FOTO KE-2 INTERAKTIF (8 KOLOM) -->
+            <div class="lg:col-span-8 flex flex-col gap-3.5 w-full">
+
+                <!-- Top Toolbar Langkah 3 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2.5 shadow-lg">
+                    <!-- Mode Interaksi di Preview Foto 2 -->
+                    <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                        <button type="button" data-mode="transform" class="mode-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition bg-blue-600 text-white shadow" title="Geser, Resize, Stretch, atau Putar Stempel di atas Foto 2">
+                            <i data-lucide="move" class="w-3.5 h-3.5"></i>
+                            <span>Geser / Resize / Stretch</span>
+                        </button>
+                        <button type="button" data-mode="erase" class="mode-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" title="Kuas Hapus Noda langsung di Preview Foto 2">
+                            <i data-lucide="eraser" class="w-3.5 h-3.5 text-rose-400"></i>
+                            <span>Kuas Hapus</span>
+                        </button>
+                        <button type="button" data-mode="restore" class="mode-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" title="Kuas Pulihkan Tinta Biru langsung di Preview Foto 2">
+                            <i data-lucide="paintbrush" class="w-3.5 h-3.5 text-sky-400"></i>
+                            <span>Kuas Pulihkan</span>
+                        </button>
+                        <button type="button" data-mode="pan" class="mode-btn inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" title="Geser tampilan layar kanvas">
+                            <i data-lucide="hand" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Ukuran Kuas & Undo/Redo -->
+                    <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+                        <span class="text-[11px] text-slate-400">Kuas:</span>
+                        <input id="sliderBrushSize" type="range" min="3" max="60" value="16" class="w-20">
+                        <span id="valBrushSize" class="text-xs font-mono text-blue-400 w-8 text-right">16px</span>
+                        <div class="w-px h-4 bg-slate-800 mx-0.5"></div>
+                        <button id="btnUndo" type="button" disabled class="p-1 rounded-lg text-slate-300 hover:text-white disabled:opacity-35 transition" title="Undo Kuas (Ctrl+Z)">
+                            <i data-lucide="undo-2" class="w-4 h-4"></i>
+                        </button>
+                        <button id="btnRedo" type="button" disabled class="p-1 rounded-lg text-slate-300 hover:text-white disabled:opacity-35 transition" title="Redo Kuas (Ctrl+Y)">
+                            <i data-lucide="redo-2" class="w-4 h-4"></i>
+                        </button>
+                        <button id="btnResetBrush" type="button" class="text-[11px] text-slate-400 hover:text-rose-300 px-1.5 transition" title="Reset sapuan kuas">
+                            Reset
+                        </button>
+                    </div>
+
+                    <!-- Toggle Gizmo & Fokus Stempel Saja -->
+                    <div class="flex items-center gap-1.5 ml-auto">
+                        <button id="btnToggleGizmo" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800 text-blue-300 border border-blue-500/30 transition" title="Tampilkan/Sembunyikan kotak garis bantu Resize & Stretch">
+                            <i data-lucide="scan-line" class="w-3.5 h-3.5"></i>
+                            <span>Garis Bantu</span>
+                        </button>
+                        <button id="btnSoloStamp" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" title="Lihat stempel saja dengan latar transparan untuk mengecek kebersihan noda">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            <span>Cek Transparan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KANVAS UTAMA: PREVIEW FOTO KE-2 + STEMPEL -->
+                <div id="previewViewport" class="relative w-full h-[460px] sm:h-[580px] rounded-2xl border border-slate-800 overflow-hidden shadow-2xl bg-checkerboard flex items-center justify-center select-none">
+                    <canvas id="compositeCanvas" class="block"></canvas>
+
+                    <!-- Indikator Cincin Kuas -->
+                    <div id="brushCursorRing" class="pointer-events-none fixed hidden rounded-full border-2 border-blue-400 bg-blue-400/15 -translate-x-1/2 -translate-y-1/2 z-40"></div>
+
+                    <!-- Floating Info & Zoom Bar -->
+                    <div class="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+                        <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-3 py-1.5 rounded-xl flex flex-wrap items-center gap-2.5 text-[11px] text-slate-300 shadow-lg">
+                            <span>Preview Foto 2: <strong id="statTargetDim" class="font-mono text-white">920×640</strong></span>
+                            <span class="text-slate-600">|</span>
+                            <span>Ukuran Stempel: <strong id="statStampScale" class="font-mono text-blue-400">100% × 100%</strong></span>
+                            <span class="hidden sm:inline text-slate-600">|</span>
+                            <span class="hidden sm:inline">Opacity: <strong id="statStampOpacity" class="font-mono text-emerald-400">92%</strong></span>
+                        </div>
+
+                        <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/80 p-1 rounded-xl flex items-center gap-1 shadow-lg">
+                            <button id="btnZoomOut" type="button" class="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                                <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button id="btnZoomFit" type="button" class="px-2 py-1 rounded-lg text-[11px] font-mono text-slate-200 hover:bg-slate-800 transition">
+                                Fit
+                            </button>
+                            <button id="btnZoomIn" type="button" class="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                                <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =============================================================== -->
+                <!-- BAR EKSPOR LANGKAH 4: DOWNLOAD JPG, PNG, ATAU PDF CETAK         -->
+                <!-- =============================================================== -->
+                <div id="exportBarSection" class="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">4</span>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Langkah 4: Download Hasil Preview Selesai</h3>
+                            <p class="text-xs text-slate-400">Garis bantu otomatis disembunyikan saat mengunduh ke <strong>JPG</strong>, <strong>PNG</strong>, atau <strong>PDF Cetak</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+                        <button id="btnExportJPG" type="button" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-950/50 transition">
+                            <i data-lucide="image" class="w-4 h-4"></i>
+                            <span>Download JPG</span>
+                        </button>
+                        <button id="btnExportPNG" type="button" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 transition">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Download PNG</span>
+                        </button>
+                        <button id="btnExportPDF" type="button" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-950/50 transition">
+                            <i data-lucide="printer" class="w-4 h-4"></i>
+                            <span>Download PDF Cetak</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KOLOM KANAN: PANEL KONTROL EDITING STEMPEL & FOTO 2 (4 KOLOM) -->
+            <aside class="lg:col-span-4 flex flex-col gap-3.5 w-full max-h-[840px] overflow-y-auto pr-1">
+
+                <!-- PANEL A: AUTO SAMAKAN KUALITAS & PENCAHAYAAN STEMPEL DENGAN FOTO 2 -->
+                <div class="bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-900 border border-indigo-500/40 rounded-2xl p-4 shadow-lg flex flex-col gap-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="wand-sparkles" class="w-4 h-4 text-amber-400"></i>
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-white">Auto Samakan Kualitas &amp; Pencahayaan</h2>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer" title="Aktifkan penyatuan otomatis pencahayaan & kualitas stempel dengan Foto 2">
+                            <input type="checkbox" id="toggleAutoHarmonize" checked class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
+                        </label>
+                    </div>
+
+                    <p class="text-[11px] text-slate-300 leading-relaxed">
+                        Menganalisis area kertas <strong>Foto 2</strong> tepat di bawah stempel, lalu menyamakan pencahayaan, warna dasar kertas, serat/grain, dan kelembutan resolusi.
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                        <button id="btnAutoMatchNow" type="button" class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow transition">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                            <span>Samakan Kualitas &amp; Pencahayaan Sekarang</span>
+                        </button>
+                    </div>
+
+                    <!-- Slider Intensitas Penyatuan Kualitas & Pencahayaan -->
+                    <div class="space-y-1 pt-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderMatchStrength" class="font-medium text-slate-200">Intensitas Penyatuan Kertas &amp; Cahaya</label>
+                            <span id="valMatchStrength" class="font-mono text-indigo-300">75%</span>
+                        </div>
+                        <input id="sliderMatchStrength" type="range" min="0" max="100" value="75" class="w-full">
+                    </div>
+
+                    <!-- Indikator Hasil Analisis Lokal Foto 2 -->
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 grid grid-cols-3 gap-2 text-[10px] text-slate-400">
+                        <div>
+                            <span>Terang Kertas:</span>
+                            <div id="metricLocalLum" class="font-mono text-slate-200 font-semibold">91%</div>
+                        </div>
+                        <div>
+                            <span>Suhu Kertas:</span>
+                            <div id="metricPaperTint" class="font-mono text-amber-300 font-semibold">Hangat</div>
+                        </div>
+                        <div>
+                            <span>Kelembutan:</span>
+                            <div id="metricSoftness" class="font-mono text-emerald-300 font-semibold">Sinkron</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL B: RESIZE, STRETCH, ROTASI & OPACITY STEMPEL -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                            <i data-lucide="scaling" class="w-4 h-4 text-blue-400"></i>
+                            Resize, Stretch &amp; Opacity Stempel
+                        </h2>
+                        <button id="btnResetTransform" type="button" class="text-[11px] text-blue-400 hover:text-blue-300 font-medium">
+                            Reset Ukuran
+                        </button>
+                    </div>
+
+                    <!-- Opacity Stamp -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderStampOpacity" class="font-medium text-slate-200">Opacity Stempel</label>
+                            <span id="valStampOpacity" class="font-mono text-emerald-400">92%</span>
+                        </div>
+                        <input id="sliderStampOpacity" type="range" min="10" max="100" value="92" class="w-full">
+                    </div>
+
+                    <!-- Resize Proporsional -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderStampScale" class="font-medium text-slate-200">Resize Ukuran Umum</label>
+                            <span id="valStampScale" class="font-mono text-blue-400">100%</span>
+                        </div>
+                        <input id="sliderStampScale" type="range" min="20" max="250" value="100" class="w-full">
+                    </div>
+
+                    <!-- Stretch X & Stretch Y -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px]">
+                                <label for="sliderStretchX" class="font-medium text-slate-300">Stretch Lebar (X)</label>
+                                <span id="valStretchX" class="font-mono text-blue-400">100%</span>
+                            </div>
+                            <input id="sliderStretchX" type="range" min="40" max="200" value="100" class="w-full">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px]">
+                                <label for="sliderStretchY" class="font-medium text-slate-300">Stretch Tinggi (Y)</label>
+                                <span id="valStretchY" class="font-mono text-blue-400">100%</span>
+                            </div>
+                            <input id="sliderStretchY" type="range" min="40" max="200" value="100" class="w-full">
+                        </div>
+                    </div>
+
+                    <!-- Rotasi / Pelurus Kemiringan Stempel -->
+                    <div class="space-y-1 pt-1 border-t border-slate-800/80">
+                        <div class="flex items-center justify-between text-xs">
+                            <label for="sliderStampAngle" class="font-medium text-slate-200">Rotasi / Pelurus Stempel</label>
+                            <div class="flex items-center gap-1.5">
+                                <button id="btnQuickStraighten" type="button" class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] hover:bg-blue-500/30">
+                                    Luruskan +6.5°
+                                </button>
+                                <span id="valStampAngle" class="font-mono text-blue-400 w-12 text-right">+6.5°</span>
+                            </div>
+                        </div>
+                        <input id="sliderStampAngle" type="range" min="-45" max="45" step="0.5" value="6.5" class="w-full">
+                    </div>
+                </div>
+
+                <!-- PANEL C: PEMBERSIH STEMPEL (STAMP CLEANING & REKONSTRUKSI BIRU) -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                            <i data-lucide="filter" class="w-4 h-4 text-sky-400"></i>
+                            Pembersih Tinta Biru Stempel
+                        </h2>
+                        <button id="btnResetClean" type="button" class="text-[11px] text-sky-400 hover:text-sky-300 font-medium">
+                            Default Bersih
+                        </button>
+                    </div>
+
+                    <!-- Kepekaan Warna Biru -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderBlueThresh" class="font-medium text-slate-200">Kepekaan Pemisah Biru</label>
+                            <span id="valBlueThresh" class="font-mono text-sky-400">14</span>
+                        </div>
+                        <input id="sliderBlueThresh" type="range" min="2" max="55" value="14" class="w-full">
+                    </div>
+
+                    <!-- Pemulihan Tinta Pudar -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderCyanRecover" class="font-medium text-slate-200">Pemulih Tinta Pudar (JUN.)</label>
+                            <span id="valCyanRecover" class="font-mono text-sky-400">78%</span>
+                        </div>
+                        <input id="sliderCyanRecover" type="range" min="0" max="100" value="78" class="w-full">
+                    </div>
+
+                    <!-- Pembersih Bintik Otomatis -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderDespeckle" class="font-medium text-slate-200">Hapus Bintik Kertas (Despeckle)</label>
+                            <span id="valDespeckle" class="font-mono text-sky-400">22 px</span>
+                        </div>
+                        <input id="sliderDespeckle" type="range" min="0" max="80" value="22" class="w-full">
+                    </div>
+
+                    <!-- Penutup Celah & Ketebalan -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <label for="sliderInkBoost" class="font-medium text-slate-200">Penutup Pori &amp; Ketebalan Huruf</label>
+                            <span id="valInkBoost" class="font-mono text-sky-400">1 Lapis</span>
+                        </div>
+                        <input id="sliderInkBoost" type="range" min="0" max="3" step="1" value="1" class="w-full">
+                    </div>
+
+                    <!-- Rekonstruksi Warna Biru & Kepekatan -->
+                    <div class="pt-2 border-t border-slate-800 flex flex-col gap-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-slate-200">Rekonstruksi Warna Biru Pekat</span>
+                            <input type="checkbox" id="chkReconstructColor" checked class="w-4 h-4 rounded text-blue-600 bg-slate-950 border-slate-700">
+                        </div>
+                        <div class="flex items-center justify-between gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-ink="#0a369d" class="ink-swatch w-6 h-6 rounded-lg bg-[#0a369d] ring-2 ring-white"></button>
+                                <button type="button" data-ink="#1d4ed8" class="ink-swatch w-6 h-6 rounded-lg bg-[#1d4ed8] opacity-75 hover:opacity-100"></button>
+                                <button type="button" data-ink="#0f2557" class="ink-swatch w-6 h-6 rounded-lg bg-[#0f2557] opacity-75 hover:opacity-100"></button>
+                                <button type="button" data-ink="#0284c7" class="ink-swatch w-6 h-6 rounded-lg bg-[#0284c7] opacity-75 hover:opacity-100"></button>
+                            </div>
+                            <input id="pickerInkColor" type="color" value="#0a369d" class="w-6 h-6 rounded cursor-pointer bg-transparent border-0">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderInkDensity" class="font-medium text-slate-200">Kepekatan Tinta (Density)</label>
+                                <span id="valInkDensity" class="font-mono text-sky-400">165%</span>
+                            </div>
+                            <input id="sliderInkDensity" type="range" min="80" max="260" value="165" class="w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================================== -->
+                <!-- PANEL D: PARAMETER "LANJUTAN" (EDIT FOTO KE-2) — TERTUTUP DEFAULT   -->
+                <!-- =================================================================== -->
+                <details id="advancedPhoto2Details" class="group bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden transition-all">
+                    <summary class="cursor-pointer select-none p-4 flex items-center justify-between gap-2 hover:bg-slate-800/50 transition">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-amber-400"></i>
+                            <div>
+                                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">Parameter Lanjutan (Edit Foto ke-2)</h2>
+                                <p class="text-[10px] text-slate-400">Brightness, Contrast, Shadow, Highlight, Gamma, Saturation</p>
+                            </div>
+                        </div>
+                        <div class="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 group-open:rotate-180 transition-transform">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </div>
+                    </summary>
+
+                    <div class="p-4 pt-2 border-t border-slate-800/80 flex flex-col gap-3 bg-slate-950/40">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Sesuaikan pencahayaan &amp; warna Foto Target (Foto 2)</span>
+                            <button id="btnResetPhoto2Params" type="button" class="text-[11px] text-amber-400 hover:text-amber-300 font-medium">
+                                Reset Foto 2
+                            </button>
+                        </div>
+
+                        <!-- 1. Brightness -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderP2Brightness" class="font-medium text-slate-200">Brightness (Kecerahan)</label>
+                                <span id="valP2Brightness" class="font-mono text-amber-400">0</span>
+                            </div>
+                            <input id="sliderP2Brightness" type="range" min="-100" max="100" value="0" class="w-full">
+                        </div>
+
+                        <!-- 2. Contrast -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderP2Contrast" class="font-medium text-slate-200">Contrast (Kontras)</label>
+                                <span id="valP2Contrast" class="font-mono text-amber-400">0</span>
+                            </div>
+                            <input id="sliderP2Contrast" type="range" min="-100" max="100" value="0" class="w-full">
+                        </div>
+
+                        <!-- 3. Shadow -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderP2Shadow" class="font-medium text-slate-200">Shadow (Area Bayangan)</label>
+                                <span id="valP2Shadow" class="font-mono text-amber-400">0</span>
+                            </div>
+                            <input id="sliderP2Shadow" type="range" min="-100" max="100" value="0" class="w-full">
+                        </div>
+
+                        <!-- 4. Highlight -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderP2Highlight" class="font-medium text-slate-200">Highlight (Area Terang)</label>
+                                <span id="valP2Highlight" class="font-mono text-amber-400">0</span>
+                            </div>
+                            <input id="sliderP2Highlight" type="range" min="-100" max="100" value="0" class="w-full">
+                        </div>
+
+                        <!-- 5. Gamma -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderP2Gamma" class="font-medium text-slate-200">Gamma</label>
+                                <span id="valP2Gamma" class="font-mono text-amber-400">1.00</span>
+                            </div>
+                            <input id="sliderP2Gamma" type="range" min="0.20" max="3.00" step="0.05" value="1.00" class="w-full">
+                        </div>
+
+                        <!-- 6. Saturation -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <label for="sliderP2Saturation" class="font-medium text-slate-200">Saturation (Saturasi Warna)</label>
+                                <span id="valP2Saturation" class="font-mono text-amber-400">0</span>
+                            </div>
+                            <input id="sliderP2Saturation" type="range" min="-100" max="100" value="0" class="w-full">
+                        </div>
+                    </div>
+                </details>
+
+            </aside>
+        </section>
+
+        <!-- ======================================================================= -->
+        <!-- MODAL / SECTION LANGKAH 4: CETAK & DOWNLOAD HASIL AKHIR                 -->
+        <!-- ======================================================================= -->
+        <section id="stepSection4" class="hidden bg-slate-900/95 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-base flex items-center justify-center">4</span>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white">Langkah 4: Pratinjau Akhir &amp; Download (JPG, PNG, PDF Cetak)</h2>
+                        <p class="text-xs text-slate-400">Hasil akhir penggabungan Stempel Bersih + Foto ke-2 siap disimpan atau dicetak.</p>
+                    </div>
+                </div>
+                <button id="btnBackToStep3" type="button" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Kembali ke Editor Preview Foto 2</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Gambar Pratinjau Bersih (Tanpa Garis Bantu) -->
+                <div class="lg:col-span-8 bg-slate-950 border border-slate-800 rounded-2xl p-4 flex items-center justify-center min-h-[420px]">
+                    <canvas id="finalExportPreviewCanvas" class="max-h-[500px] max-w-full object-contain rounded-lg shadow-2xl"></canvas>
+                </div>
+
+                <!-- Pilihan Format Unduhan -->
+                <div class="lg:col-span-4 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
+                    <div>
+                        <label for="inputExportName" class="text-xs font-semibold text-slate-300 block mb-1.5">Nama File Hasil Unduhan</label>
+                        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
+                            <input id="inputExportName" type="text" value="dokumen-stempel-shin-chitose" class="bg-transparent text-xs text-white w-full focus:outline-none font-mono">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2.5 pt-1">
+                        <button id="btnStep4DownloadJPG" type="button" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm flex items-center justify-between shadow-lg shadow-blue-950/50 transition">
+                            <span class="flex items-center gap-2.5">
+                                <i data-lucide="file-image" class="w-4 h-4"></i>
+                                <span>Download Gambar JPG</span>
+                            </span>
+                            <span class="text-[11px] font-mono bg-white/20 px-2 py-0.5 rounded">.JPG</span>
+                        </button>
+
+                        <button id="btnStep4DownloadPNG" type="button" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm flex items-center justify-between shadow-lg shadow-emerald-950/50 transition">
+                            <span class="flex items-center gap-2.5">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                <span>Download Gambar PNG</span>
+                            </span>
+                            <span class="text-[11px] font-mono bg-white/20 px-2 py-0.5 rounded">.PNG</span>
+                        </button>
+
+                        <button id="btnStep4DownloadPDF" type="button" class="w-full py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs sm:text-sm flex items-center justify-between shadow-lg shadow-amber-950/50 transition">
+                            <span class="flex items-center gap-2.5">
+                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                <span>Download PDF Cetak</span>
+                            </span>
+                            <span class="text-[11px] font-mono bg-white/20 px-2 py-0.5 rounded">.PDF</span>
+                        </button>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-800">
+                        <button id="btnStep4DownloadStampOnlyPNG" type="button" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-medium flex items-center justify-center gap-2 transition">
+                            <i data-lucide="stamp" class="w-3.5 h-3.5 text-sky-400"></i>
+                            <span>Unduh Stempel Bersih Saja (PNG Transparan)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastBox" class="fixed bottom-5 right-5 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-slate-900/95 border border-blue-500/40 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div class="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+            <i data-lucide="check" class="w-4 h-4"></i>
+        </div>
+        <span id="toastMessage" class="text-xs font-medium">Siap digunakan!</span>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- LOGIKA APLIKASI UTAMA (JAVASCRIPT)                                      -->
+    <!-- ======================================================================= -->
+    <script>
+        lucide.createIcons();
+
+        // ============================================================================
+        // STATE GLOBAL APLIKASI 4 LANGKAH
+        // ============================================================================
+        const state = {
+            currentStep: 1,
+
+            // LANGKAH 2: Kotak Crop pada Foto 1 (dalam koordinat piksel Foto 1)
+            cropBox: { x: 185, y: 165, w: 510, h: 255 },
+            cropDragMode: null, // 'move' | 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'e' | 'w' | 'new'
+            cropDragStart: { mouseX: 0, mouseY: 0, box: null },
+            cropViewScale: 1,
+            cropViewOffsetX: 0,
+            cropViewOffsetY: 0,
+
+            // LANGKAH 3: Filter Pembersih Stempel
+            blueThreshold: 14,
+            cyanRecovery: 78,
+            despeckleSize: 22,
+            inkBoost: 1,
+            reconstructInk: true,
+            inkColorHex: '#0a369d',
+            inkColorRGB: { r: 10, g: 54, b: 157 },
+            inkDensity: 165,
+
+            // LANGKAH 3: Transformasi Stempel di atas Preview Foto ke-2
+            stampPos: { x: 460, y: 315 }, // Posisi tengah stempel pada koordinat Foto 2
+            stampScale: 100,              // Resize proporsional (%)
+            stampStretchX: 100,           // Stretch Lebar X (%)
+            stampStretchY: 100,           // Stretch Tinggi Y (%)
+            stampAngle: 6.5,              // Sudut rotasi/pelurus (°)
+            stampOpacity: 92,             // Opacity stempel (%)
+
+            // Auto Samakan Kualitas & Pencahayaan dengan Foto 2
+            autoHarmonize: true,
+            harmonizeStrength: 75,        // 0 - 100%
+            sampledPaper: { lum: 0.91, r: 242, g: 240, b: 233, contrast: 0.12 },
+
+            // Parameter "Lanjutan" untuk Edit Foto ke-2
+            p2: {
+                brightness: 0,   // -100 s/d 100
+                contrast: 0,     // -100 s/d 100
+                shadow: 0,       // -100 s/d 100
+                highlight: 0,    // -100 s/d 100
+                gamma: 1.00,     // 0.20 s/d 3.00
+                saturation: 0    // -100 s/d 100
+            },
+
+            // Interaksi Kanvas Langkah 3
+            interactionMode: 'transform', // 'transform' | 'erase' | 'restore' | 'pan'
+            brushSize: 16,
+            showGizmo: true,
+            soloStampMode: false,
+
+            // Viewport Zoom & Pan pada Langkah 3
+            viewZoom: 1,
+            viewPanX: 0,
+            viewPanY: 0,
+            activeGizmoHandle: null,      // 'move' | 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'e' | 'w' | 'rot'
+            dragStartInfo: null
+        };
+
+        // ============================================================================
+        // KANVAS BUFFER OFF-SCREEN
+        // ============================================================================
+        // 1. Foto 1 (Sumber dengan Stempel)
+        const photo1Canvas = document.createElement('canvas');
+        const photo1Ctx = photo1Canvas.getContext('2d', { willReadFrequently: true });
+
+        // 2. Hasil Potongan (Crop) Foto 1 — hanya menyisakan area yang di-crop
+        const croppedStampCanvas = document.createElement('canvas');
+        const croppedStampCtx = croppedStampCanvas.getContext('2d', { willReadFrequently: true });
+        let croppedStampImageData = null;
+
+        // 3. Stempel yang sudah dibersihkan & direkonstruksi
+        const cleanedStampCanvas = document.createElement('canvas');
+        const cleanedStampCtx = cleanedStampCanvas.getContext('2d', { willReadFrequently: true });
+
+        // 4. Foto 2 Asli (Foto Target Stempel)
+        const photo2RawCanvas = document.createElement('canvas');
+        const photo2RawCtx = photo2RawCanvas.getContext('2d', { willReadFrequently: true });
+        let photo2RawImageData = null;
+
+        // 5. Foto 2 yang sudah diedit dengan Parameter Lanjutan (Brightness, Contrast, Shadow, Highlight, Gamma, Saturation)
+        const photo2EditedCanvas = document.createElement('canvas');
+        const photo2EditedCtx = photo2EditedCanvas.getContext('2d', { willReadFrequently: true });
+
+        // 6. Masker Kuas Manual untuk Stempel (berukuran sama dengan croppedStampCanvas)
+        let manualMask = null;
+        let undoStack = [];
+        let redoStack = [];
+
+        // Elemen Kanvas di DOM
+        const thumbCanvas1 = document.getElementById('thumbCanvas1');
+        const thumbCanvas2 = document.getElementById('thumbCanvas2');
+        const cropCanvas = document.getElementById('cropCanvas');
+        const cropCtx = cropCanvas.getContext('2d');
+        const croppedResultPreviewCanvas = document.getElementById('croppedResultPreviewCanvas');
+        const compositeCanvas = document.getElementById('compositeCanvas');
+        const compositeCtx = compositeCanvas.getContext('2d');
+        const finalExportPreviewCanvas = document.getElementById('finalExportPreviewCanvas');
+
+        // ============================================================================
+        // GENERATOR SAMPEL DEMO REALISTIS (FOTO 1 & FOTO 2)
+        // ============================================================================
+        function generateDemoPhotos() {
+            // ------------------------------------------------------------------------
+            // A. GENERATE FOTO 1: Halaman Paspor dengan Stempel Miring SHIN CHITOSE A.P.
+            // ------------------------------------------------------------------------
+            const w1 = 900, h1 = 620;
+            photo1Canvas.width = w1;
+            photo1Canvas.height = h1;
+
+            // Latar meja gelap di tepi luar halaman
+            photo1Ctx.fillStyle = '#e5e0d8';
+            photo1Ctx.fillRect(0, 0, w1, h1);
+
+            // Tekstur kertas paspor sumber
+            photo1Ctx.fillStyle = '#f5f2eb';
+            photo1Ctx.fillRect(20, 20, w1 - 40, h1 - 40);
+
+            // Jaring gelombang pengaman (guilloche) di seluruh halaman Foto 1
+            photo1Ctx.lineWidth = 1;
+            for (let y = 25; y < h1 - 25; y += 8) {
+                photo1Ctx.strokeStyle = (y % 16 === 0) ? 'rgba(182, 174, 146, 0.52)' : 'rgba(158, 173, 162, 0.42)';
+                photo1Ctx.beginPath();
+                for (let x = 25; x < w1 - 25; x += 8) {
+                    const wy = y + Math.sin((x + y * 0.5) * 0.18) * 3.5;
+                    if (x === 25) photo1Ctx.moveTo(x, wy);
+                    else photo1Ctx.lineTo(x, wy);
+                }
+                photo1Ctx.stroke();
+            }
+
+            // Header halaman paspor Foto 1 (di luar area crop agar terlihat kenapa perlu di-crop)
+            photo1Ctx.fillStyle = 'rgba(120, 110, 95, 0.55)';
+            photo1Ctx.font = '600 18px "Inter", sans-serif';
+            photo1Ctx.textAlign = 'center';
+            photo1Ctx.fillText('VISAS / ENDORSEMENTS — PAGE 14 (DOKUMEN SUMBER)', w1 / 2, 62);
+
+            // Pola bintik merah/coklat kertas paspor
+            for (let y = 85; y < h1 - 35; y += 13) {
+                for (let x = 35; x < w1 - 35; x += 13) {
+                    const ox = ((y / 13) % 2) * 6.5;
+                    photo1Ctx.fillStyle = 'rgba(168, 92, 98, 0.58)';
+                    photo1Ctx.beginPath();
+                    photo1Ctx.arc(x + ox, y, 1.8, 0, Math.PI * 2);
+                    photo1Ctx.fill();
+                }
+            }
+
+            // Gambar Stempel Biru Miring "SHIN CHITOSE A.P. 28. JUN. 2026" di area (185, 165, 510, 255)
+            const stampW = 480, stampH = 210;
+            const stampLayer = document.createElement('canvas');
+            stampLayer.width = stampW;
+            stampLayer.height = stampH;
+            const sCtx = stampLayer.getContext('2d');
+
+            sCtx.textAlign = 'center';
+            sCtx.textBaseline = 'middle';
+
+            // Teks Baris 1: SHIN CHITOSE A.P.
+            sCtx.save();
+            sCtx.scale(0.82, 1.18);
+            sCtx.font = '700 43px "Inter", sans-serif';
+            sCtx.fillStyle = 'rgba(22, 102, 205, 0.86)';
+            sCtx.fillText('SHIN CHITOSE A.P.', (stampW / 2) / 0.82, 52 / 1.18);
+            sCtx.fillStyle = '#072a78';
+            sCtx.fillText('SHIN CHITOSE A.P.', (stampW / 2 - 0.8) / 0.82, 52 / 1.18);
+            sCtx.restore();
+
+            // Teks Baris 2: 28. JUN. 2026
+            sCtx.save();
+            sCtx.scale(0.75, 1.32);
+            sCtx.font = '700 56px "Inter", sans-serif';
+            sCtx.fillStyle = 'rgba(28, 110, 212, 0.88)';
+            sCtx.fillText('28.   JUN.  2026', (stampW / 2 + 10) / 0.75, 145 / 1.32);
+            sCtx.fillStyle = '#0a3388';
+            sCtx.fillText('28.   JUN.  2026', (stampW / 2 + 9) / 0.75, 145 / 1.32);
+            sCtx.restore();
+
+            // Efek pudar alami pada bagian tengah "JUN." seperti stmpl2.jpg
+            const sData = sCtx.getImageData(0, 0, stampW, stampH);
+            const sp = sData.data;
+            for (let y = 0; y < stampH; y++) {
+                for (let x = 0; x < stampW; x++) {
+                    const idx = (y * stampW + x) * 4;
+                    if (sp[idx + 3] > 0) {
+                        const grain = (Math.sin(x * 1.7) * Math.cos(y * 1.9) + Math.sin((x + y) * 0.9)) * 0.24 + 0.78;
+                        const distJun = Math.hypot(x - stampW * 0.51, y - stampH * 0.68);
+                        const junFade = distJun < 74 ? (0.48 + (distJun / 74) * 0.45) : 0.92;
+                        const f = Math.max(0.28, Math.min(1, grain * junFade));
+                        if (f < 0.68) {
+                            sp[idx] = Math.min(255, sp[idx] + 34);
+                            sp[idx + 1] = Math.min(255, sp[idx + 1] + 64);
+                            sp[idx + 2] = Math.min(255, sp[idx + 2] + 92);
+                        }
+                        sp[idx + 3] = Math.round(sp[idx + 3] * f);
+                    }
+                }
+            }
+            sCtx.putImageData(sData, 0, 0);
+
+            photo1Ctx.save();
+            photo1Ctx.translate(440, 292);
+            photo1Ctx.rotate((-6.5 * Math.PI) / 180);
+            photo1Ctx.drawImage(stampLayer, -stampW / 2, -stampH / 2);
+            photo1Ctx.restore();
+
+            // Set default Crop Box tepat di sekeliling stempel pada Foto 1
+            state.cropBox = { x: 185, y: 165, w: 510, h: 255 };
+
+            // ------------------------------------------------------------------------
+            // B. GENERATE FOTO 2: Halaman Dokumen / Visa Target Stempel yang Bersih
+            // ------------------------------------------------------------------------
+            const w2 = 920, h2 = 640;
+            photo2RawCanvas.width = w2;
+            photo2RawCanvas.height = h2;
+
+            // Kertas dokumen hangat dengan sedikit vignette alami
+            const grad = photo2RawCtx.createRadialGradient(w2 / 2, h2 / 2, 80, w2 / 2, h2 / 2, 560);
+            grad.addColorStop(0, '#fbf9f3');
+            grad.addColorStop(1, '#ece6d8');
+            photo2RawCtx.fillStyle = grad;
+            photo2RawCtx.fillRect(0, 0, w2, h2);
+
+            // Bingkai ornamen halaman dokumen target
+            photo2RawCtx.strokeStyle = 'rgba(120, 138, 155, 0.45)';
+            photo2RawCtx.lineWidth = 2;
+            photo2RawCtx.strokeRect(36, 36, w2 - 72, h2 - 72);
+            photo2RawCtx.lineWidth = 1;
+            photo2RawCtx.strokeRect(44, 44, w2 - 88, h2 - 88);
+
+            // Garis-garis halus latar dokumen Foto 2
+            for (let y = 55; y < h2 - 55; y += 6) {
+                photo2RawCtx.strokeStyle = 'rgba(175, 185, 195, 0.22)';
+                photo2RawCtx.beginPath();
+                for (let x = 50; x < w2 - 50; x += 10) {
+                    const wy = y + Math.sin(x * 0.08 + y * 0.05) * 1.8;
+                    if (x === 50) photo2RawCtx.moveTo(x, wy);
+                    else photo2RawCtx.lineTo(x, wy);
+                }
+                photo2RawCtx.stroke();
+            }
+
+            // Judul & Kotak Kolom Stempel pada Foto 2
+            photo2RawCtx.fillStyle = 'rgba(70, 85, 105, 0.72)';
+            photo2RawCtx.font = '700 20px "Inter", sans-serif';
+            photo2RawCtx.textAlign = 'center';
+            photo2RawCtx.fillText('IMMIGRATION CLEARANCE & ENTRY RECORD', w2 / 2, 92);
+
+            photo2RawCtx.font = '500 12px "JetBrains Mono", monospace';
+            photo2RawCtx.fillStyle = 'rgba(95, 110, 130, 0.65)';
+            photo2RawCtx.fillText('OFFICIAL STAMP AREA / KOLOM STEMPEL KEDATANGAN', w2 / 2, 120);
+
+            // Kotak area target di tengah halaman Foto 2
+            photo2RawCtx.setLineDash([8, 6]);
+            photo2RawCtx.strokeStyle = 'rgba(100, 120, 145, 0.45)';
+            photo2RawCtx.lineWidth = 1.5;
+            photo2RawCtx.strokeRect(170, 160, 580, 310);
+            photo2RawCtx.setLineDash([]);
+
+            // Nomor halaman bawah
+            photo2RawCtx.font = '600 14px "JetBrains Mono", monospace';
+            photo2RawCtx.fillStyle = 'rgba(100, 110, 125, 0.6)';
+            photo2RawCtx.fillText('— PAGE 08 —', w2 / 2, h2 - 64);
+
+            photo2RawImageData = photo2RawCtx.getImageData(0, 0, w2, h2);
+            state.stampPos = { x: w2 / 2, y: 315 };
+            state.stampAngle = 6.5;
+            document.getElementById('sliderStampAngle').value = 6.5;
+            document.getElementById('valStampAngle').textContent = '+6.5°';
+
+            // Render semua tahap secara berurutan
+            renderStep1Thumbnails();
+            executeCropFromPhoto1();
+            applyPhoto2AdvancedAdjustments();
+            analyzeUnderlyingPaperAndHarmonize();
+            renderCompositePreview();
+        }
+
+        // ============================================================================
+        // LANGKAH 1: RENDER THUMBNAIL & UNGGAH FILE FOTO 1 DAN FOTO 2
+        // ============================================================================
+        function renderStep1Thumbnails() {
+            // Thumbnail 1
+            thumbCanvas1.width = photo1Canvas.width;
+            thumbCanvas1.height = photo1Canvas.height;
+            const t1Ctx = thumbCanvas1.getContext('2d');
+            t1Ctx.drawImage(photo1Canvas, 0, 0);
+            // Gambar kotak indikator crop pada thumbnail 1
+            t1Ctx.strokeStyle = '#3b82f6';
+            t1Ctx.lineWidth = Math.max(3, photo1Canvas.width * 0.005);
+            t1Ctx.strokeRect(state.cropBox.x, state.cropBox.y, state.cropBox.w, state.cropBox.h);
+
+            // Thumbnail 2
+            thumbCanvas2.width = photo2RawCanvas.width;
+            thumbCanvas2.height = photo2RawCanvas.height;
+            const t2Ctx = thumbCanvas2.getContext('2d');
+            t2Ctx.drawImage(photo2RawCanvas, 0, 0);
+        }
+
+        function handleFileUpload(file, isPhoto1) {
+            if (!file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxDim = 1600;
+                    let w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        const sc = maxDim / Math.max(w, h);
+                        w = Math.round(w * sc);
+                        h = Math.round(h * sc);
+                    }
+
+                    if (isPhoto1) {
+                        photo1Canvas.width = w;
+                        photo1Canvas.height = h;
+                        photo1Ctx.clearRect(0, 0, w, h);
+                        photo1Ctx.drawImage(img, 0, 0, w, h);
+                        document.getElementById('photo1Meta').textContent = `${file.name} (${w} × ${h} px)`;
+
+                        // Jika gambar yang diunggah sudah berupa potongan stempel kecil, seleksi hampir seluruh area
+                        const marginX = w < 650 ? Math.round(w * 0.03) : Math.round(w * 0.15);
+                        const marginY = h < 400 ? Math.round(h * 0.03) : Math.round(h * 0.18);
+                        state.cropBox = {
+                            x: marginX,
+                            y: marginY,
+                            w: Math.max(40, w - marginX * 2),
+                            h: Math.max(40, h - marginY * 2)
+                        };
+
+                        renderStep1Thumbnails();
+                        executeCropFromPhoto1();
+                        renderCropWorkspace();
+                        renderCompositePreview();
+                        showToast(`Foto 1 "${file.name}" berhasil dimuat! Silakan atur Crop di Langkah 2.`);
+                    } else {
+                        photo2RawCanvas.width = w;
+                        photo2RawCanvas.height = h;
+                        photo2RawCtx.clearRect(0, 0, w, h);
+                        photo2RawCtx.drawImage(img, 0, 0, w, h);
+                        photo2RawImageData = photo2RawCtx.getImageData(0, 0, w, h);
+                        document.getElementById('photo2Meta').textContent = `${file.name} (${w} × ${h} px)`;
+                        document.getElementById('statTargetDim').textContent = `${w}×${h}`;
+
+                        // Posisikan stempel di tengah Foto 2 yang baru
+                        state.stampPos = { x: w / 2, y: h / 2 };
+
+                        renderStep1Thumbnails();
+                        applyPhoto2AdvancedAdjustments();
+                        analyzeUnderlyingPaperAndHarmonize();
+                        fitCompositeViewport();
+                        showToast(`Foto 2 "${file.name}" berhasil dimuat sebagai target!`);
+                    }
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('inputPhoto1').addEventListener('change', (e) => {
+            if (e.target.files?.[0]) handleFileUpload(e.target.files[0], true);
+        });
+        document.getElementById('inputPhoto2').addEventListener('change', (e) => {
+            if (e.target.files?.[0]) handleFileUpload(e.target.files[0], false);
+        });
+
+        // Drag & Drop untuk Kartu Foto 1 dan Foto 2
+        function setupDropZone(zoneId, isPhoto1) {
+            const zone = document.getElementById(zoneId);
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('ring-2', 'ring-blue-400', 'bg-slate-900');
+            });
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('ring-2', 'ring-blue-400', 'bg-slate-900');
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('ring-2', 'ring-blue-400', 'bg-slate-900');
+                if (e.dataTransfer.files?.[0]) handleFileUpload(e.dataTransfer.files[0], isPhoto1);
+            });
+        }
+        setupDropZone('dropZone1', true);
+        setupDropZone('dropZone2', false);
+
+        // ============================================================================
+        // LANGKAH 2: CROPPING FOTO 1 & EKSTRAKSI AREA STEMPEL
+        // ============================================================================
+        function executeCropFromPhoto1() {
+            const cb = state.cropBox;
+            const cw = Math.max(16, Math.round(cb.w));
+            const ch = Math.max(16, Math.round(cb.h));
+            const cx = Math.max(0, Math.min(photo1Canvas.width - cw, Math.round(cb.x)));
+            const cy = Math.max(0, Math.min(photo1Canvas.height - ch, Math.round(cb.y)));
+
+            croppedStampCanvas.width = cw;
+            croppedStampCanvas.height = ch;
+            croppedStampCtx.clearRect(0, 0, cw, ch);
+            croppedStampCtx.drawImage(photo1Canvas, cx, cy, cw, ch, 0, 0, cw, ch);
+
+            croppedStampImageData = croppedStampCtx.getImageData(0, 0, cw, ch);
+
+            // Buat masker kuas baru jika ukuran crop berubah
+            if (!manualMask || manualMask.length !== cw * ch) {
+                manualMask = new Float32Array(cw * ch);
+                undoStack = [];
+                redoStack = [];
+                updateUndoRedoUI();
+            }
+
+            // Tampilkan hasil crop pada preview Langkah 2
+            croppedResultPreviewCanvas.width = cw;
+            croppedResultPreviewCanvas.height = ch;
+            croppedResultPreviewCanvas.getContext('2d').drawImage(croppedStampCanvas, 0, 0);
+
+            document.getElementById('cropDimLabel').textContent = `${cw} × ${ch} px`;
+            document.getElementById('cropCoordText').textContent = `${cx}, ${cy}`;
+            document.getElementById('cropSizeText').textContent = `${cw} × ${ch} px`;
+
+            // Bersihkan stempel dari potongan tersebut
+            processStampCleaning();
+        }
+
+        function renderCropWorkspace() {
+            const vp = document.getElementById('cropViewport');
+            const rect = vp.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            cropCanvas.width = Math.floor(rect.width);
+            cropCanvas.height = Math.floor(rect.height);
+
+            const pw = photo1Canvas.width;
+            const ph = photo1Canvas.height;
+            const pad = 36;
+            const scale = Math.min((cropCanvas.width - pad * 2) / pw, (cropCanvas.height - pad * 2) / ph);
+            const offsetX = (cropCanvas.width - pw * scale) / 2;
+            const offsetY = (cropCanvas.height - ph * scale) / 2;
+
+            state.cropViewScale = scale;
+            state.cropViewOffsetX = offsetX;
+            state.cropViewOffsetY = offsetY;
+
+            cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+
+            // 1. Gambar seluruh Foto 1 agak digelapkan di luar area crop
+            cropCtx.save();
+            cropCtx.translate(offsetX, offsetY);
+            cropCtx.scale(scale, scale);
+            cropCtx.drawImage(photo1Canvas, 0, 0);
+
+            // Overlay gelap di luar kotak crop
+            cropCtx.fillStyle = 'rgba(2, 6, 23, 0.68)';
+            cropCtx.fillRect(0, 0, pw, ph);
+
+            // 2. Gambar bagian dalam kotak crop dengan terang penuh
+            const { x, y, w, h } = state.cropBox;
+            cropCtx.drawImage(photo1Canvas, x, y, w, h, x, y, w, h);
+            cropCtx.restore();
+
+            // 3. Gambar bingkai kotak crop & 8 titik handle dalam koordinat layar
+            const sx = offsetX + x * scale;
+            const sy = offsetY + y * scale;
+            const sw = w * scale;
+            const sh = h * scale;
+
+            cropCtx.strokeStyle = '#38bdf8';
+            cropCtx.lineWidth = 2;
+            cropCtx.strokeRect(sx, sy, sw, sh);
+
+            // Garis bantu Rule of Thirds di dalam kotak crop
+            cropCtx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+            cropCtx.lineWidth = 1;
+            cropCtx.beginPath();
+            cropCtx.moveTo(sx + sw / 3, sy); cropCtx.lineTo(sx + sw / 3, sy + sh);
+            cropCtx.moveTo(sx + (sw * 2) / 3, sy); cropCtx.lineTo(sx + (sw * 2) / 3, sy + sh);
+            cropCtx.moveTo(sx, sy + sh / 3); cropCtx.lineTo(sx + sw, sy + sh / 3);
+            cropCtx.moveTo(sx, sy + (sh * 2) / 3); cropCtx.lineTo(sx + sw, sy + (sh * 2) / 3);
+            cropCtx.stroke();
+
+            // Gambar 8 titik handle
+            const handles = getCropHandlesScreen(sx, sy, sw, sh);
+            cropCtx.fillStyle = '#ffffff';
+            cropCtx.strokeStyle = '#0284c7';
+            cropCtx.lineWidth = 2;
+            Object.values(handles).forEach(pt => {
+                cropCtx.beginPath();
+                cropCtx.rect(pt.x - 5, pt.y - 5, 10, 10);
+                cropCtx.fill();
+                cropCtx.stroke();
+            });
+        }
+
+        function getCropHandlesScreen(sx, sy, sw, sh) {
+            return {
+                nw: { x: sx, y: sy },
+                ne: { x: sx + sw, y: sy },
+                sw: { x: sx, y: sy + sh },
+                se: { x: sx + sw, y: sy + sh },
+                n:  { x: sx + sw / 2, y: sy },
+                s:  { x: sx + sw / 2, y: sy + sh },
+                w:  { x: sx, y: sy + sh / 2 },
+                e:  { x: sx + sw, y: sy + sh / 2 }
+            };
+        }
+
+        // Interaksi Mouse/Touch pada Kanvas Crop Langkah 2
+        cropCanvas.addEventListener('pointerdown', (e) => {
+            const rect = cropCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            const { x, y, w, h } = state.cropBox;
+            const sx = state.cropViewOffsetX + x * state.cropViewScale;
+            const sy = state.cropViewOffsetY + y * state.cropViewScale;
+            const sw = w * state.cropViewScale;
+            const sh = h * state.cropViewScale;
+
+            const handles = getCropHandlesScreen(sx, sy, sw, sh);
+            let hit = null;
+            for (const [key, pt] of Object.entries(handles)) {
+                if (Math.hypot(mx - pt.x, my - pt.y) <= 12) {
+                    hit = key;
+                    break;
+                }
+            }
+
+            if (!hit) {
+                if (mx >= sx && mx <= sx + sw && my >= sy && my <= sy + sh) {
+                    hit = 'move';
+                } else {
+                    hit = 'new';
+                }
+            }
+
+            state.cropDragMode = hit;
+            state.cropDragStart = {
+                mouseX: mx,
+                mouseY: my,
+                box: { ...state.cropBox }
+            };
+
+            if (hit === 'new') {
+                const px = Math.max(0, Math.min(photo1Canvas.width - 20, (mx - state.cropViewOffsetX) / state.cropViewScale));
+                const py = Math.max(0, Math.min(photo1Canvas.height - 20, (my - state.cropViewOffsetY) / state.cropViewScale));
+                state.cropBox = { x: px, y: py, w: 20, h: 20 };
+                state.cropDragStart.box = { ...state.cropBox };
+                state.cropDragMode = 'se';
+            }
+
+            cropCanvas.setPointerCapture(e.pointerId);
+        });
+
+        cropCanvas.addEventListener('pointermove', (e) => {
+            if (!state.cropDragMode) return;
+            const rect = cropCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            const dx = (mx - state.cropDragStart.mouseX) / state.cropViewScale;
+            const dy = (my - state.cropDragStart.mouseY) / state.cropViewScale;
+            const b = state.cropDragStart.box;
+            const pw = photo1Canvas.width;
+            const ph = photo1Canvas.height;
+            const minSize = 32;
+
+            let nx = b.x, ny = b.y, nw = b.w, nh = b.h;
+            const mode = state.cropDragMode;
+
+            if (mode === 'move') {
+                nx = Math.max(0, Math.min(pw - nw, b.x + dx));
+                ny = Math.max(0, Math.min(ph - nh, b.y + dy));
+            } else {
+                if (mode.includes('w')) {
+                    nx = Math.max(0, Math.min(b.x + b.w - minSize, b.x + dx));
+                    nw = b.w - (nx - b.x);
+                }
+                if (mode.includes('e')) {
+                    nw = Math.max(minSize, Math.min(pw - b.x, b.w + dx));
+                }
+                if (mode.includes('n')) {
+                    ny = Math.max(0, Math.min(b.y + b.h - minSize, b.y + dy));
+                    nh = b.h - (ny - b.y);
+                }
+                if (mode.includes('s')) {
+                    nh = Math.max(minSize, Math.min(ph - b.y, b.h + dy));
+                }
+            }
+
+            state.cropBox = { x: nx, y: ny, w: nw, h: nh };
+            executeCropFromPhoto1();
+            renderCropWorkspace();
+            renderStep1Thumbnails();
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (state.cropDragMode) {
+                state.cropDragMode = null;
+                renderCompositePreview();
+            }
+        });
+
+        document.getElementById('btnResetCropBox').addEventListener('click', () => {
+            const w = photo1Canvas.width;
+            const h = photo1Canvas.height;
+            if (w === 900 && h === 620) {
+                state.cropBox = { x: 185, y: 165, w: 510, h: 255 };
+            } else {
+                state.cropBox = { x: w * 0.1, y: h * 0.1, w: w * 0.8, h: h * 0.8 };
+            }
+            executeCropFromPhoto1();
+            renderCropWorkspace();
+            renderStep1Thumbnails();
+            showToast('Kotak crop difokuskan ke area stempel');
+        });
+
+        // ============================================================================
+        // LANGKAH 3A: ALGORITMA PEMBERSIH STEMPEL BIRU (STAMP CLEANING ENGINE)
+        // ============================================================================
+        function processStampCleaning() {
+            if (!croppedStampImageData) return;
+
+            const w = croppedStampCanvas.width;
+            const h = croppedStampCanvas.height;
+            const src = croppedStampImageData.data;
+            const totalPixels = w * h;
+
+            cleanedStampCanvas.width = w;
+            cleanedStampCanvas.height = h;
+
+            const alphaMap = new Uint8Array(totalPixels);
+            const blueThresh = state.blueThreshold;
+            const cyanBoost = state.cyanRecovery / 100;
+
+            // 1. Pemisahan Tinta Biru & Sian dari Pola Bintik Kertas
+            for (let i = 0; i < totalPixels; i++) {
+                const idx = i * 4;
+                const r = src[idx];
+                const g = src[idx + 1];
+                const b = src[idx + 2];
+                const a = src[idx + 3];
+
+                if (a < 25 || (r > 242 && g > 242 && b > 242)) {
+                    alphaMap[i] = 0;
+                    continue;
+                }
+
+                const blueOverRed = b - r;
+                if (blueOverRed < 3) {
+                    alphaMap[i] = 0;
+                    continue;
+                }
+
+                const maxC = Math.max(r, g, b);
+                const minC = Math.min(r, g, b);
+                const delta = maxC - minC;
+                const lum = r * 0.299 + g * 0.587 + b * 0.114;
+
+                let hue = 0;
+                if (delta > 0) {
+                    if (maxC === b) hue = 60 * (((r - g) / delta) + 4);
+                    else if (maxC === g) hue = 60 * (((b - r) / delta) + 2);
+                    else hue = 60 * (((g - b) / delta) % 6);
+                    if (hue < 0) hue += 360;
+                }
+
+                const sat = maxC === 0 ? 0 : delta / maxC;
+                const isBlueCyanHue = (hue >= 172 && hue <= 265);
+                if (!isBlueCyanHue && lum > 75) {
+                    alphaMap[i] = 0;
+                    continue;
+                }
+
+                const effectiveGreenDiff = b - (g * (0.88 - cyanBoost * 0.22));
+                const chromaScore = (blueOverRed * 0.68) + (effectiveGreenDiff * 0.45) + (sat * 42 * (0.5 + cyanBoost * 0.7));
+                const darkNavyBonus = (lum < 95 && blueOverRed >= 8 && b >= g) ? (95 - lum) * 0.45 : 0;
+
+                const totalScore = chromaScore + darkNavyBonus;
+                const cutoff = blueThresh * (1.22 - cyanBoost * 0.38);
+
+                if (totalScore > cutoff) {
+                    const norm = Math.min(1, (totalScore - cutoff) / Math.max(8, 28 - cyanBoost * 12));
+                    const darknessFactor = Math.max(0.35, Math.min(1, (245 - lum) / 135));
+                    alphaMap[i] = Math.min(255, Math.round(norm * darknessFactor * 255));
+                }
+            }
+
+            // 2. Penutup Celah Pori Huruf (Morphological Ink Boost)
+            let workAlpha = alphaMap;
+            if (state.inkBoost > 0) {
+                for (let pass = 0; pass < state.inkBoost; pass++) {
+                    const nextAlpha = new Uint8Array(workAlpha);
+                    for (let y = 1; y < h - 1; y++) {
+                        const row = y * w;
+                        for (let x = 1; x < w - 1; x++) {
+                            const i = row + x;
+                            const current = workAlpha[i];
+                            let strongNeighbors = 0;
+                            let maxNeighbor = current;
+                            let sumNeighbor = 0;
+
+                            for (let dy = -1; dy <= 1; dy++) {
+                                const nRow = (y + dy) * w;
+                                for (let dx = -1; dx <= 1; dx++) {
+                                    if (dx === 0 && dy === 0) continue;
+                                    const nv = workAlpha[nRow + x + dx];
+                                    if (nv > 85) strongNeighbors++;
+                                    if (nv > maxNeighbor) maxNeighbor = nv;
+                                    sumNeighbor += nv;
+                                }
+                            }
+
+                            if (strongNeighbors >= 4 && current < 180) {
+                                const idx = i * 4;
+                                if (src[idx + 2] >= src[idx] - 5) {
+                                    nextAlpha[i] = Math.min(255, Math.max(current, Math.round(sumNeighbor / 7)));
+                                }
+                            } else if (strongNeighbors >= 2 && current > 15) {
+                                nextAlpha[i] = Math.min(255, Math.round(current * 1.25 + maxNeighbor * 0.15));
+                            }
+                        }
+                    }
+                    workAlpha = nextAlpha;
+                }
+            }
+
+            // 3. Pembersih Bintik Otomatis (Connected-Component Despeckle)
+            const minBlobSize = state.despeckleSize;
+            if (minBlobSize > 0) {
+                const visited = new Uint8Array(totalPixels);
+                const queue = new Int32Array(totalPixels);
+                const componentIndices = [];
+
+                for (let i = 0; i < totalPixels; i++) {
+                    if (workAlpha[i] > 12 && !visited[i]) {
+                        componentIndices.length = 0;
+                        let head = 0, tail = 0;
+                        queue[tail++] = i;
+                        visited[i] = 1;
+
+                        while (head < tail) {
+                            const curr = queue[head++];
+                            componentIndices.push(curr);
+                            const cx = curr % w;
+                            const cy = (curr - cx) / w;
+
+                            for (let dy = -1; dy <= 1; dy++) {
+                                const ny = cy + dy;
+                                if (ny < 0 || ny >= h) continue;
+                                const nRow = ny * w;
+                                for (let dx = -1; dx <= 1; dx++) {
+                                    const nx = cx + dx;
+                                    if (nx < 0 || nx >= w) continue;
+                                    const ni = nRow + nx;
+                                    if (!visited[ni] && workAlpha[ni] > 12) {
+                                        visited[ni] = 1;
+                                        queue[tail++] = ni;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (componentIndices.length < minBlobSize) {
+                            for (let k = 0; k < componentIndices.length; k++) {
+                                workAlpha[componentIndices[k]] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 4. Gabungkan Masker Kuas Manual + Rekonstruksi Warna + Harmonisasi Pencahayaan Foto 2
+            const outImg = cleanedStampCtx.createImageData(w, h);
+            const dst = outImg.data;
+            const targetR = state.inkColorRGB.r;
+            const targetG = state.inkColorRGB.g;
+            const targetB = state.inkColorRGB.b;
+            const densityMult = state.inkDensity / 100;
+
+            // Faktor Harmonisasi dengan Kertas Foto 2
+            const harmFactor = state.autoHarmonize ? (state.harmonizeStrength / 100) : 0;
+            const paperLum = state.sampledPaper.lum; // 0.0 - 1.0
+            const paperR = state.sampledPaper.r;
+            const paperG = state.sampledPaper.g;
+            const paperB = state.sampledPaper.b;
+
+            for (let i = 0; i < totalPixels; i++) {
+                let finalAlpha = workAlpha[i];
+                const maskVal = manualMask ? manualMask[i] : 0;
+
+                if (maskVal < 0) {
+                    finalAlpha = Math.max(0, Math.round(finalAlpha * (1 + maskVal)));
+                } else if (maskVal > 0) {
+                    const idx = i * 4;
+                    const lum = src[idx] * 0.299 + src[idx + 1] * 0.587 + src[idx + 2] * 0.114;
+                    const restoredAlpha = Math.min(255, Math.max(175, Math.round((250 - lum) * 2.2)));
+                    finalAlpha = Math.min(255, Math.round(finalAlpha * (1 - maskVal) + restoredAlpha * maskVal));
+                }
+
+                if (finalAlpha <= 8) continue;
+
+                finalAlpha = Math.min(255, Math.round(finalAlpha * densityMult));
+                const idx = i * 4;
+
+                let rOut, gOut, bOut;
+                if (state.reconstructInk) {
+                    const origLum = (src[idx] * 0.299 + src[idx + 1] * 0.587 + src[idx + 2] * 0.114) / 255;
+                    const shade = Math.max(0.64, Math.min(1.18, 0.72 + origLum * 0.45));
+                    rOut = targetR * shade;
+                    gOut = targetG * shade;
+                    bOut = targetB * shade;
+                } else {
+                    rOut = Math.min(src[idx], src[idx + 2] * 0.65);
+                    gOut = src[idx + 1];
+                    bOut = Math.max(src[idx + 2], 110);
+                }
+
+                // Jika Auto Samakan Kualitas & Pencahayaan Aktif:
+                // Sesuaikan kecerahan tinta, suhu warna kertas Foto 2, dan tekstur mikro kertas
+                if (harmFactor > 0) {
+                    // Simulasi serapan tinta pada kertas Foto 2 (Multiply terhadap warna kertas lokal)
+                    const multR = (rOut * paperR) / 245;
+                    const multG = (gOut * paperG) / 245;
+                    const multB = (bOut * paperB) / 245;
+
+                    // Angkat sedikit bayangan tinta agar menyatu dengan kontras foto
+                    const ambientLift = (paperLum * 28) * harmFactor;
+                    rOut = rOut * (1 - harmFactor * 0.65) + multR * (harmFactor * 0.65) + ambientLift * 0.8;
+                    gOut = gOut * (1 - harmFactor * 0.65) + multG * (harmFactor * 0.65) + ambientLift * 0.85;
+                    bOut = bOut * (1 - harmFactor * 0.65) + multB * (harmFactor * 0.65) + ambientLift;
+
+                    // Serat kertas mikro agar tinta tidak tampak "tempelan digital tajam"
+                    const x = i % w;
+                    const y = (i - x) / w;
+                    const paperGrain = 1 - ((Math.sin(x * 2.1 + y * 1.7) * 0.5 + 0.5) * 0.14 * harmFactor);
+                    finalAlpha = Math.round(finalAlpha * paperGrain);
+                }
+
+                dst[idx]     = Math.max(0, Math.min(255, Math.round(rOut)));
+                dst[idx + 1] = Math.max(0, Math.min(255, Math.round(gOut)));
+                dst[idx + 2] = Math.max(0, Math.min(255, Math.round(bOut)));
+                dst[idx + 3] = Math.max(0, Math.min(255, finalAlpha));
+            }
+
+            cleanedStampCtx.putImageData(outImg, 0, 0);
+        }
+
+        // ============================================================================
+        // LANGKAH 3B: PARAMETER "LANJUTAN" UNTUK MENGEDIT FOTO KE-2
+        // (Brightness, Contrast, Shadow, Highlight, Gamma, Saturation)
+        // ============================================================================
+        function applyPhoto2AdvancedAdjustments() {
+            if (!photo2RawImageData) return;
+            const w = photo2RawCanvas.width;
+            const h = photo2RawCanvas.height;
+            photo2EditedCanvas.width = w;
+            photo2EditedCanvas.height = h;
+
+            const { brightness, contrast, shadow, highlight, gamma, saturation } = state.p2;
+
+            // Jika semua parameter masih default, langsung salin cepat
+            if (brightness === 0 && contrast === 0 && shadow === 0 && highlight === 0 && gamma === 1 && saturation === 0) {
+                photo2EditedCtx.putImageData(photo2RawImageData, 0, 0);
+                return;
+            }
+
+            const src = photo2RawImageData.data;
+            const out = photo2EditedCtx.createImageData(w, h);
+            const dst = out.data;
+
+            const brightOffset = (brightness / 100) * 110;
+            const contrastFactor = Math.pow((contrast + 100) / 100, 2);
+            const shadowStrength = (shadow / 100) * 95;
+            const highlightStrength = (highlight / 100) * 95;
+            const invGamma = 1 / Math.max(0.2, gamma);
+            const satFactor = (saturation + 100) / 100;
+
+            // Buat tabel Lookup (LUT) untuk Gamma agar pemrosesan real-time sangat cepat
+            const gammaLUT = new Uint8Array(256);
+            for (let v = 0; v < 256; v++) {
+                gammaLUT[v] = Math.min(255, Math.max(0, Math.round(255 * Math.pow(v / 255, invGamma))));
+            }
+
+            for (let i = 0; i < src.length; i += 4) {
+                let r = src[i];
+                let g = src[i + 1];
+                let b = src[i + 2];
+
+                // 1. Brightness
+                r += brightOffset;
+                g += brightOffset;
+                b += brightOffset;
+
+                // 2. Contrast (di sekitar titik tengah 128)
+                r = (r - 128) * contrastFactor + 128;
+                g = (g - 128) * contrastFactor + 128;
+                b = (b - 128) * contrastFactor + 128;
+
+                // 3. Shadow & 4. Highlight berdasarkan Luminance Piksel
+                const lumNorm = Math.max(0, Math.min(1, (r * 0.299 + g * 0.587 + b * 0.114) / 255));
+                if (shadow !== 0) {
+                    const sWeight = Math.pow(1 - lumNorm, 2);
+                    const deltaS = shadowStrength * sWeight;
+                    r += deltaS; g += deltaS; b += deltaS;
+                }
+                if (highlight !== 0) {
+                    const hWeight = Math.pow(lumNorm, 2);
+                    const deltaH = highlightStrength * hWeight;
+                    r += deltaH; g += deltaH; b += deltaH;
+                }
+
+                // Clamp sementara ke 0..255 lalu terapkan 5. Gamma
+                r = gammaLUT[Math.max(0, Math.min(255, Math.round(r)))];
+                g = gammaLUT[Math.max(0, Math.min(255, Math.round(g)))];
+                b = gammaLUT[Math.max(0, Math.min(255, Math.round(b)))];
+
+                // 6. Saturation
+                if (saturation !== 0) {
+                    const gray = r * 0.299 + g * 0.587 + b * 0.114;
+                    r = gray + (r - gray) * satFactor;
+                    g = gray + (g - gray) * satFactor;
+                    b = gray + (b - gray) * satFactor;
+                }
+
+                dst[i]     = Math.max(0, Math.min(255, Math.round(r)));
+                dst[i + 1] = Math.max(0, Math.min(255, Math.round(g)));
+                dst[i + 2] = Math.max(0, Math.min(255, Math.round(b)));
+                dst[i + 3] = src[i + 3];
+            }
+
+            photo2EditedCtx.putImageData(out, 0, 0);
+        }
+
+        // ============================================================================
+        // LANGKAH 3C: ANALISIS PENCAHAYAAN & KUALITAS FOTO 2 DI BAWAH POSISI STEMPEL
+        // ============================================================================
+        function analyzeUnderlyingPaperAndHarmonize() {
+            const w2 = photo2EditedCanvas.width;
+            const h2 = photo2EditedCanvas.height;
+            if (w2 === 0 || h2 === 0) return;
+
+            const effW = croppedStampCanvas.width * (state.stampScale / 100) * (state.stampStretchX / 100);
+            const effH = croppedStampCanvas.height * (state.stampScale / 100) * (state.stampStretchY / 100);
+
+            const x0 = Math.max(0, Math.floor(state.stampPos.x - effW / 2));
+            const y0 = Math.max(0, Math.floor(state.stampPos.y - effH / 2));
+            const sw = Math.max(10, Math.min(w2 - x0, Math.floor(effW)));
+            const sh = Math.max(10, Math.min(h2 - y0, Math.floor(effH)));
+
+            const data = photo2EditedCtx.getImageData(x0, y0, sw, sh).data;
+            let sumR = 0, sumG = 0, sumB = 0, count = 0;
+
+            // Sampling setiap 4 piksel untuk kecepatan tinggi
+            for (let i = 0; i < data.length; i += 16) {
+                sumR += data[i];
+                sumG += data[i + 1];
+                sumB += data[i + 2];
+                count++;
+            }
+
+            if (count > 0) {
+                const avgR = sumR / count;
+                const avgG = sumG / count;
+                const avgB = sumB / count;
+                const avgLum = (avgR * 0.299 + avgG * 0.587 + avgB * 0.114) / 255;
+
+                state.sampledPaper = {
+                    lum: avgLum,
+                    r: avgR,
+                    g: avgG,
+                    b: avgB,
+                    contrast: 0.12
+                };
+
+                // Perbarui UI metrik diagnostik
+                document.getElementById('metricLocalLum').textContent = `${Math.round(avgLum * 100)}%`;
+                const warmth = avgR - avgB;
+                document.getElementById('metricPaperTint').textContent = warmth > 6 ? 'Hangat (Krem)' : (warmth < -6 ? 'Dingin (Biru)' : 'Netral');
+                document.getElementById('metricSoftness').textContent = state.autoHarmonize ? 'Disamakan' : 'Murni';
+            }
+
+            processStampCleaning();
+        }
+
+        // ============================================================================
+        // LANGKAH 3D: RENDER KOMPOSISI PREVIEW FOTO KE-2 + STEMPEL + GIZMO INTERAKTIF
+        // ============================================================================
+        function getStampEffectiveDimensions() {
+            const baseW = croppedStampCanvas.width || 300;
+            const baseH = croppedStampCanvas.height || 150;
+            const w = baseW * (state.stampScale / 100) * (state.stampStretchX / 100);
+            const h = baseH * (state.stampScale / 100) * (state.stampStretchY / 100);
+            return { w, h };
+        }
+
+        function renderCompositeToContext(ctx, targetWidth, targetHeight, includeGizmo = false) {
+            ctx.clearRect(0, 0, targetWidth, targetHeight);
+
+            // 1. Gambar Foto ke-2 yang sudah diedit (kecuali jika mode Cek Transparan aktif)
+            if (!state.soloStampMode) {
+                ctx.drawImage(photo2EditedCanvas, 0, 0, targetWidth, targetHeight);
+            }
+
+            // 2. Gambar Stempel yang sudah dibersihkan di posisi, ukuran, stretch, rotasi, dan opacity saat ini
+            const { w, h } = getStampEffectiveDimensions();
+            const rad = (state.stampAngle * Math.PI) / 180;
+
+            ctx.save();
+            ctx.translate(state.stampPos.x, state.stampPos.y);
+            ctx.rotate(rad);
+            ctx.globalAlpha = state.stampOpacity / 100;
+
+            // Jika Auto Samakan Kualitas aktif, beri sedikit kelembutan tepi sub-piksel agar menyatu dengan resolusi Foto 2
+            if (state.autoHarmonize && state.harmonizeStrength > 25 && !state.soloStampMode) {
+                const blurPx = ((state.harmonizeStrength - 25) / 75) * 0.48;
+                ctx.filter = `blur(${blurPx.toFixed(2)}px)`;
+            }
+
+            ctx.drawImage(cleanedStampCanvas, -w / 2, -h / 2, w, h);
+            ctx.filter = 'none';
+            ctx.globalAlpha = 1.0;
+
+            // 3. Gambar Gizmo Transformasi (Resize Sudut, Stretch Sisi, & Gagang Rotasi) jika diaktifkan
+            if (includeGizmo && state.showGizmo) {
+                const invZoom = 1 / Math.max(0.3, state.viewZoom);
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2 * invZoom;
+                ctx.setLineDash([6 * invZoom, 4 * invZoom]);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
+                ctx.setLineDash([]);
+
+                // Garis dan titik gagang rotasi di bagian atas
+                const rotDist = 28 * invZoom;
+                ctx.beginPath();
+                ctx.moveTo(0, -h / 2);
+                ctx.lineTo(0, -h / 2 - rotDist);
+                ctx.stroke();
+
+                ctx.fillStyle = '#f59e0b';
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2 * invZoom;
+                ctx.beginPath();
+                ctx.arc(0, -h / 2 - rotDist, 6.5 * invZoom, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // 4 Handle Sudut (Resize Proporsional) — bentuk kotak putih-biru
+                const corners = [
+                    { x: -w / 2, y: -h / 2 },
+                    { x:  w / 2, y: -h / 2 },
+                    { x: -w / 2, y:  h / 2 },
+                    { x:  w / 2, y:  h / 2 }
+                ];
+                const hs = 6 * invZoom;
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#2563eb';
+                corners.forEach(c => {
+                    ctx.beginPath();
+                    ctx.rect(c.x - hs, c.y - hs, hs * 2, hs * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+
+                // 4 Handle Sisi Tengah (Stretch Lebar X / Stretch Tinggi Y) — warna sian
+                const sides = [
+                    { x: 0,      y: -h / 2 },
+                    { x: 0,      y:  h / 2 },
+                    { x: -w / 2, y: 0 },
+                    { x:  w / 2, y: 0 }
+                ];
+                ctx.fillStyle = '#38bdf8';
+                ctx.strokeStyle = '#0f172a';
+                sides.forEach(s => {
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, 5.5 * invZoom, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+            }
+
+            ctx.restore();
+        }
+
+        function renderCompositePreview() {
+            const vp = document.getElementById('previewViewport');
+            const rect = vp.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            if (compositeCanvas.width !== Math.floor(rect.width) || compositeCanvas.height !== Math.floor(rect.height)) {
+                compositeCanvas.width = Math.floor(rect.width);
+                compositeCanvas.height = Math.floor(rect.height);
+            }
+
+            const cw = compositeCanvas.width;
+            const ch = compositeCanvas.height;
+            compositeCtx.clearRect(0, 0, cw, ch);
+
+            const w2 = photo2EditedCanvas.width;
+            const h2 = photo2EditedCanvas.height;
+
+            compositeCtx.save();
+            compositeCtx.translate(cw / 2 + state.viewPanX, ch / 2 + state.viewPanY);
+            compositeCtx.scale(state.viewZoom, state.viewZoom);
+            compositeCtx.translate(-w2 / 2, -h2 / 2);
+
+            // Render komposisi beserta garis bantu gizmo
+            renderCompositeToContext(compositeCtx, w2, h2, true);
+            compositeCtx.restore();
+
+            // Perbarui label status bawah
+            const sx = Math.round((state.stampScale * state.stampStretchX) / 100);
+            const sy = Math.round((state.stampScale * state.stampStretchY) / 100);
+            document.getElementById('statStampScale').textContent = `${sx}% × ${sy}%`;
+            document.getElementById('statStampOpacity').textContent = `${state.stampOpacity}%`;
+        }
+
+        function fitCompositeViewport() {
+            const vp = document.getElementById('previewViewport');
+            const rect = vp.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            const w2 = photo2EditedCanvas.width || 920;
+            const h2 = photo2EditedCanvas.height || 640;
+            const pad = 40;
+            state.viewZoom = Math.min(1.5, Math.max(0.2, Math.min((rect.width - pad) / w2, (rect.height - pad) / h2)));
+            state.viewPanX = 0;
+            state.viewPanY = 0;
+            document.getElementById('btnZoomFit').textContent = `${Math.round(state.viewZoom * 100)}%`;
+            renderCompositePreview();
+        }
+
+        // ============================================================================
+        // PEMETAAN KOORDINAT MOUSE DI PREVIEW FOTO 2 KE GIZMO & MASKER KUAS STEMPEL
+        // ============================================================================
+        function screenToPhoto2Coords(clientX, clientY) {
+            const rect = compositeCanvas.getBoundingClientRect();
+            const mx = clientX - rect.left;
+            const my = clientY - rect.top;
+
+            const w2 = photo2EditedCanvas.width;
+            const h2 = photo2EditedCanvas.height;
+
+            const x = (mx - (compositeCanvas.width / 2 + state.viewPanX)) / state.viewZoom + w2 / 2;
+            const y = (my - (compositeCanvas.height / 2 + state.viewPanY)) / state.viewZoom + h2 / 2;
+            return { x, y };
+        }
+
+        function photo2ToStampLocalCoords(p2x, p2y) {
+            const dx = p2x - state.stampPos.x;
+            const dy = p2y - state.stampPos.y;
+            const rad = (-state.stampAngle * Math.PI) / 180;
+            const lx = dx * Math.cos(rad) - dy * Math.sin(rad);
+            const ly = dx * Math.sin(rad) + dy * Math.cos(rad);
+            return { lx, ly };
+        }
+
+        function screenToStampCropPixel(clientX, clientY) {
+            const p2 = screenToPhoto2Coords(clientX, clientY);
+            const { lx, ly } = photo2ToStampLocalCoords(p2.x, p2.y);
+            const { w, h } = getStampEffectiveDimensions();
+
+            const normX = (lx + w / 2) / w;
+            const normY = (ly + h / 2) / h;
+
+            return {
+                x: normX * croppedStampCanvas.width,
+                y: normY * croppedStampCanvas.height
+            };
+        }
+
+        function detectGizmoHandle(p2x, p2y) {
+            const { lx, ly } = photo2ToStampLocalCoords(p2x, p2y);
+            const { w, h } = getStampEffectiveDimensions();
+            const invZoom = 1 / Math.max(0.3, state.viewZoom);
+            const tol = 13 * invZoom;
+
+            // Cek gagang rotasi atas
+            const rotY = -h / 2 - 28 * invZoom;
+            if (Math.hypot(lx - 0, ly - rotY) <= tol) return 'rot';
+
+            // Cek 4 sudut (Resize)
+            const handles = {
+                nw: { x: -w / 2, y: -h / 2 },
+                ne: { x:  w / 2, y: -h / 2 },
+                sw: { x: -w / 2, y:  h / 2 },
+                se: { x:  w / 2, y:  h / 2 },
+                n:  { x: 0,      y: -h / 2 },
+                s:  { x: 0,      y:  h / 2 },
+                w:  { x: -w / 2, y: 0 },
+                e:  { x:  w / 2, y: 0 }
+            };
+
+            for (const [key, pt] of Object.entries(handles)) {
+                if (Math.hypot(lx - pt.x, ly - pt.y) <= tol) return key;
+            }
+
+            if (lx >= -w / 2 && lx <= w / 2 && ly >= -h / 2 && ly <= h / 2) {
+                return 'move';
+            }
+            return null;
+        }
+
+        // Fungsi Kuas Hapus / Pulihkan langsung di atas Preview Foto 2
+        function applyBrushOnStamp(cropX, cropY) {
+            if (!manualMask) return;
+            const cw = croppedStampCanvas.width;
+            const ch = croppedStampCanvas.height;
+            const scaleFactor = (state.stampScale / 100) * state.viewZoom;
+            const radius = Math.max(1.5, (state.brushSize / 2) / Math.max(0.25, scaleFactor));
+            const rSq = radius * radius;
+
+            const minX = Math.max(0, Math.floor(cropX - radius));
+            const maxX = Math.min(cw - 1, Math.ceil(cropX + radius));
+            const minY = Math.max(0, Math.floor(cropY - radius));
+            const maxY = Math.min(ch - 1, Math.ceil(cropY + radius));
+
+            const dir = state.interactionMode === 'erase' ? -1 : 1;
+
+            for (let y = minY; y <= maxY; y++) {
+                const dy = y - cropY;
+                const row = y * cw;
+                for (let x = minX; x <= maxX; x++) {
+                    const dx = x - cropX;
+                    const dSq = dx * dx + dy * dy;
+                    if (dSq <= rSq) {
+                        const falloff = Math.min(1, (1 - Math.sqrt(dSq) / (radius + 0.5)) * 1.6);
+                        const idx = row + x;
+                        if (dir < 0) manualMask[idx] = Math.max(-1, manualMask[idx] - falloff);
+                        else manualMask[idx] = Math.min(1, manualMask[idx] + falloff);
+                    }
+                }
+            }
+        }
+
+        function pushMaskUndo() {
+            if (!manualMask) return;
+            undoStack.push(new Float32Array(manualMask));
+            if (undoStack.length > 25) undoStack.shift();
+            redoStack = [];
+            updateUndoRedoUI();
+        }
+
+        function updateUndoRedoUI() {
+            document.getElementById('btnUndo').disabled = undoStack.length === 0;
+            document.getElementById('btnRedo').disabled = redoStack.length === 0;
+        }
+
+        // Event Pointer pada Kanvas Komposisi Langkah 3
+        const brushCursorRing = document.getElementById('brushCursorRing');
+
+        compositeCanvas.addEventListener('pointerdown', (e) => {
+            const p2 = screenToPhoto2Coords(e.clientX, e.clientY);
+
+            if (state.interactionMode === 'erase' || state.interactionMode === 'restore') {
+                pushMaskUndo();
+                const pt = screenToStampCropPixel(e.clientX, e.clientY);
+                applyBrushOnStamp(pt.x, pt.y);
+                processStampCleaning();
+                renderCompositePreview();
+                state.dragStartInfo = { type: 'brush', lastX: e.clientX, lastY: e.clientY };
+                compositeCanvas.setPointerCapture(e.pointerId);
+                return;
+            }
+
+            if (state.interactionMode === 'pan') {
+                state.dragStartInfo = { type: 'pan', startX: e.clientX, startY: e.clientY, panX: state.viewPanX, panY: state.viewPanY };
+                compositeCanvas.setPointerCapture(e.pointerId);
+                return;
+            }
+
+            // Mode Transformasi Gizmo (Geser, Resize, Stretch, Rotasi)
+            const handle = detectGizmoHandle(p2.x, p2.y);
+            if (handle) {
+                state.activeGizmoHandle = handle;
+                state.dragStartInfo = {
+                    type: 'gizmo',
+                    handle,
+                    startP2: p2,
+                    origPos: { ...state.stampPos },
+                    origScale: state.stampScale,
+                    origStretchX: state.stampStretchX,
+                    origStretchY: state.stampStretchY,
+                    origAngle: state.stampAngle,
+                    origDim: getStampEffectiveDimensions()
+                };
+            } else {
+                // Jika klik di luar stempel, geser kanvas (pan)
+                state.dragStartInfo = { type: 'pan', startX: e.clientX, startY: e.clientY, panX: state.viewPanX, panY: state.viewPanY };
+            }
+            compositeCanvas.setPointerCapture(e.pointerId);
+        });
+
+        compositeCanvas.addEventListener('pointermove', (e) => {
+            // Update cincin kursor kuas
+            if (state.interactionMode === 'erase' || state.interactionMode === 'restore') {
+                brushCursorRing.classList.remove('hidden');
+                brushCursorRing.style.width = `${state.brushSize}px`;
+                brushCursorRing.style.height = `${state.brushSize}px`;
+                brushCursorRing.style.left = `${e.clientX}px`;
+                brushCursorRing.style.top = `${e.clientY}px`;
+                brushCursorRing.style.borderColor = state.interactionMode === 'erase' ? '#f43f5e' : '#38bdf8';
+            } else {
+                brushCursorRing.classList.add('hidden');
+            }
+
+            if (!state.dragStartInfo) {
+                // Ubah ikon kursor saat hover di atas handle gizmo
+                if (state.interactionMode === 'transform') {
+                    const p2 = screenToPhoto2Coords(e.clientX, e.clientY);
+                    const h = detectGizmoHandle(p2.x, p2.y);
+                    compositeCanvas.style.cursor = h === 'move' ? 'move' : (h === 'rot' ? 'grab' : (h ? 'nwse-resize' : 'default'));
+                }
+                return;
+            }
+
+            const info = state.dragStartInfo;
+
+            if (info.type === 'pan') {
+                state.viewPanX = info.panX + (e.clientX - info.startX);
+                state.viewPanY = info.panY + (e.clientY - info.startY);
+                renderCompositePreview();
+                return;
+            }
+
+            if (info.type === 'brush') {
+                const pt1 = screenToStampCropPixel(info.lastX, info.lastY);
+                const pt2 = screenToStampCropPixel(e.clientX, e.clientY);
+                const dist = Math.hypot(pt2.x - pt1.x, pt2.y - pt1.y);
+                const steps = Math.max(1, Math.ceil(dist / 2));
+                for (let s = 1; s <= steps; s++) {
+                    const t = s / steps;
+                    applyBrushOnStamp(pt1.x + (pt2.x - pt1.x) * t, pt1.y + (pt2.y - pt1.y) * t);
+                }
+                info.lastX = e.clientX;
+                info.lastY = e.clientY;
+                processStampCleaning();
+                renderCompositePreview();
+                return;
+            }
+
+            if (info.type === 'gizmo') {
+                const p2 = screenToPhoto2Coords(e.clientX, e.clientY);
+                const h = info.handle;
+
+                if (h === 'move') {
+                    state.stampPos.x = info.origPos.x + (p2.x - info.startP2.x);
+                    state.stampPos.y = info.origPos.y + (p2.y - info.startP2.y);
+                } else if (h === 'rot') {
+                    const angleRad = Math.atan2(p2.x - state.stampPos.x, -(p2.y - state.stampPos.y));
+                    let deg = Math.round((angleRad * 180 / Math.PI) * 2) / 2;
+                    deg = Math.max(-45, Math.min(45, deg));
+                    state.stampAngle = deg;
+                    document.getElementById('sliderStampAngle').value = deg;
+                    document.getElementById('valStampAngle').textContent = (deg >= 0 ? '+' : '') + deg.toFixed(1) + '°';
+                } else if (['nw', 'ne', 'sw', 'se'].includes(h)) {
+                    // Resize Proporsional lewat sudut
+                    const startDist = Math.max(10, Math.hypot(info.startP2.x - state.stampPos.x, info.startP2.y - state.stampPos.y));
+                    const currDist = Math.hypot(p2.x - state.stampPos.x, p2.y - state.stampPos.y);
+                    const newScale = Math.max(20, Math.min(250, Math.round(info.origScale * (currDist / startDist))));
+                    state.stampScale = newScale;
+                    document.getElementById('sliderStampScale').value = newScale;
+                    document.getElementById('valStampScale').textContent = `${newScale}%`;
+                } else if (h === 'e' || h === 'w') {
+                    // Stretch Lebar (X)
+                    const { lx } = photo2ToStampLocalCoords(p2.x, p2.y);
+                    const ratioX = Math.abs(lx) / Math.max(10, info.origDim.w / 2);
+                    const newStretchX = Math.max(40, Math.min(200, Math.round(info.origStretchX * ratioX)));
+                    state.stampStretchX = newStretchX;
+                    document.getElementById('sliderStretchX').value = newStretchX;
+                    document.getElementById('valStretchX').textContent = `${newStretchX}%`;
+                } else if (h === 'n' || h === 's') {
+                    // Stretch Tinggi (Y)
+                    const { ly } = photo2ToStampLocalCoords(p2.x, p2.y);
+                    const ratioY = Math.abs(ly) / Math.max(10, info.origDim.h / 2);
+                    const newStretchY = Math.max(40, Math.min(200, Math.round(info.origStretchY * ratioY)));
+                    state.stampStretchY = newStretchY;
+                    document.getElementById('sliderStretchY').value = newStretchY;
+                    document.getElementById('valStretchY').textContent = `${newStretchY}%`;
+                }
+
+                renderCompositePreview();
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (state.dragStartInfo) {
+                const wasGizmo = state.dragStartInfo.type === 'gizmo';
+                state.dragStartInfo = null;
+                state.activeGizmoHandle = null;
+                if (wasGizmo && state.autoHarmonize) {
+                    analyzeUnderlyingPaperAndHarmonize();
+                    renderCompositePreview();
+                }
+            }
+        });
+
+        compositeCanvas.addEventListener('pointerleave', () => {
+            brushCursorRing.classList.add('hidden');
+        });
+
+        document.getElementById('previewViewport').addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.12 : 0.89;
+            state.viewZoom = Math.min(4.5, Math.max(0.2, state.viewZoom * factor));
+            document.getElementById('btnZoomFit').textContent = `${Math.round(state.viewZoom * 100)}%`;
+            renderCompositePreview();
+        }, { passive: false });
+
+        // ============================================================================
+        // BINDING SLIDER & TOMBOL PANEL KONTROL LANGKAH 3
+        // ============================================================================
+        // Mode Interaksi Toolbar
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.interactionMode = btn.dataset.mode;
+                document.querySelectorAll('.mode-btn').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white', 'shadow');
+                    b.classList.add('text-slate-300');
+                });
+                btn.classList.add('bg-blue-600', 'text-white', 'shadow');
+                btn.classList.remove('text-slate-300');
+            });
+        });
+
+        document.getElementById('sliderBrushSize').addEventListener('input', (e) => {
+            state.brushSize = parseInt(e.target.value, 10);
+            document.getElementById('valBrushSize').textContent = `${state.brushSize}px`;
+        });
+
+        // Undo / Redo / Reset Kuas
+        function doUndo() {
+            if (undoStack.length === 0) return;
+            redoStack.push(new Float32Array(manualMask));
+            manualMask = undoStack.pop();
+            updateUndoRedoUI();
+            processStampCleaning();
+            renderCompositePreview();
+        }
+        function doRedo() {
+            if (redoStack.length === 0) return;
+            undoStack.push(new Float32Array(manualMask));
+            manualMask = redoStack.pop();
+            updateUndoRedoUI();
+            processStampCleaning();
+            renderCompositePreview();
+        }
+        document.getElementById('btnUndo').addEventListener('click', doUndo);
+        document.getElementById('btnRedo').addEventListener('click', doRedo);
+        document.getElementById('btnResetBrush').addEventListener('click', () => {
+            if (!manualMask) return;
+            pushMaskUndo();
+            manualMask.fill(0);
+            processStampCleaning();
+            renderCompositePreview();
+            showToast('Sapuan kuas direset');
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); doUndo(); }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); doRedo(); }
+        });
+
+        // Toggle Garis Bantu Gizmo & Cek Transparan
+        document.getElementById('btnToggleGizmo').addEventListener('click', (e) => {
+            state.showGizmo = !state.showGizmo;
+            e.currentTarget.classList.toggle('bg-slate-800', state.showGizmo);
+            e.currentTarget.classList.toggle('text-blue-300', state.showGizmo);
+            renderCompositePreview();
+        });
+
+        document.getElementById('btnSoloStamp').addEventListener('click', (e) => {
+            state.soloStampMode = !state.soloStampMode;
+            e.currentTarget.classList.toggle('bg-blue-600', state.soloStampMode);
+            e.currentTarget.classList.toggle('text-white', state.soloStampMode);
+            renderCompositePreview();
+        });
+
+        // Zoom Buttons
+        document.getElementById('btnZoomIn').addEventListener('click', () => {
+            state.viewZoom = Math.min(4.5, state.viewZoom * 1.25);
+            document.getElementById('btnZoomFit').textContent = `${Math.round(state.viewZoom * 100)}%`;
+            renderCompositePreview();
+        });
+        document.getElementById('btnZoomOut').addEventListener('click', () => {
+            state.viewZoom = Math.max(0.2, state.viewZoom * 0.8);
+            document.getElementById('btnZoomFit').textContent = `${Math.round(state.viewZoom * 100)}%`;
+            renderCompositePreview();
+        });
+        document.getElementById('btnZoomFit').addEventListener('click', fitCompositeViewport);
+
+        // Panel A: Auto Samakan Kualitas & Pencahayaan
+        document.getElementById('toggleAutoHarmonize').addEventListener('change', (e) => {
+            state.autoHarmonize = e.target.checked;
+            analyzeUnderlyingPaperAndHarmonize();
+            renderCompositePreview();
+        });
+        document.getElementById('sliderMatchStrength').addEventListener('input', (e) => {
+            state.harmonizeStrength = parseInt(e.target.value, 10);
+            document.getElementById('valMatchStrength').textContent = `${state.harmonizeStrength}%`;
+            analyzeUnderlyingPaperAndHarmonize();
+            renderCompositePreview();
+        });
+        document.getElementById('btnAutoMatchNow').addEventListener('click', () => {
+            state.autoHarmonize = true;
+            document.getElementById('toggleAutoHarmonize').checked = true;
+            if (state.harmonizeStrength < 60) {
+                state.harmonizeStrength = 78;
+                document.getElementById('sliderMatchStrength').value = 78;
+                document.getElementById('valMatchStrength').textContent = '78%';
+            }
+            analyzeUnderlyingPaperAndHarmonize();
+            renderCompositePreview();
+            showToast('Kualitas, pencahayaan & serat kertas stempel berhasil disamakan dengan Foto 2!');
+        });
+
+        // Panel B: Resize, Stretch, Opacity & Rotasi
+        document.getElementById('sliderStampOpacity').addEventListener('input', (e) => {
+            state.stampOpacity = parseInt(e.target.value, 10);
+            document.getElementById('valStampOpacity').textContent = `${state.stampOpacity}%`;
+            renderCompositePreview();
+        });
+        document.getElementById('sliderStampScale').addEventListener('input', (e) => {
+            state.stampScale = parseInt(e.target.value, 10);
+            document.getElementById('valStampScale').textContent = `${state.stampScale}%`;
+            renderCompositePreview();
+        });
+        document.getElementById('sliderStretchX').addEventListener('input', (e) => {
+            state.stampStretchX = parseInt(e.target.value, 10);
+            document.getElementById('valStretchX').textContent = `${state.stampStretchX}%`;
+            renderCompositePreview();
+        });
+        document.getElementById('sliderStretchY').addEventListener('input', (e) => {
+            state.stampStretchY = parseInt(e.target.value, 10);
+            document.getElementById('valStretchY').textContent = `${state.stampStretchY}%`;
+            renderCompositePreview();
+        });
+        document.getElementById('sliderStampAngle').addEventListener('input', (e) => {
+            state.stampAngle = parseFloat(e.target.value);
+            document.getElementById('valStampAngle').textContent = (state.stampAngle >= 0 ? '+' : '') + state.stampAngle.toFixed(1) + '°';
+            renderCompositePreview();
+        });
+        document.getElementById('btnQuickStraighten').addEventListener('click', () => {
+            state.stampAngle = 6.5;
+            document.getElementById('sliderStampAngle').value = 6.5;
+            document.getElementById('valStampAngle').textContent = '+6.5°';
+            renderCompositePreview();
+            showToast('Stempel diluruskan (+6.5°)');
+        });
+        document.getElementById('btnResetTransform').addEventListener('click', () => {
+            state.stampScale = 100;
+            state.stampStretchX = 100;
+            state.stampStretchY = 100;
+            state.stampOpacity = 92;
+            state.stampPos = { x: photo2EditedCanvas.width / 2, y: photo2EditedCanvas.height / 2 };
+            document.getElementById('sliderStampScale').value = 100;
+            document.getElementById('valStampScale').textContent = '100%';
+            document.getElementById('sliderStretchX').value = 100;
+            document.getElementById('valStretchX').textContent = '100%';
+            document.getElementById('sliderStretchY').value = 100;
+            document.getElementById('valStretchY').textContent = '100%';
+            document.getElementById('sliderStampOpacity').value = 92;
+            document.getElementById('valStampOpacity').textContent = '92%';
+            analyzeUnderlyingPaperAndHarmonize();
+            renderCompositePreview();
+        });
+
+        // Panel C: Filter Pembersih Stempel
+        function bindCleanSlider(id, valId, key, unit = '') {
+            const el = document.getElementById(id);
+            const vEl = document.getElementById(valId);
+            el.addEventListener('input', () => {
+                state[key] = parseFloat(el.value);
+                vEl.textContent = `${state[key]}${unit}`;
+                processStampCleaning();
+                renderCompositePreview();
+            });
+        }
+        bindCleanSlider('sliderBlueThresh', 'valBlueThresh', 'blueThreshold');
+        bindCleanSlider('sliderCyanRecover', 'valCyanRecover', 'cyanRecovery', '%');
+        bindCleanSlider('sliderDespeckle', 'valDespeckle', 'despeckleSize', ' px');
+        bindCleanSlider('sliderInkBoost', 'valInkBoost', 'inkBoost', ' Lapis');
+        bindCleanSlider('sliderInkDensity', 'valInkDensity', 'inkDensity', '%');
+
+        document.getElementById('chkReconstructColor').addEventListener('change', (e) => {
+            state.reconstructInk = e.target.checked;
+            processStampCleaning();
+            renderCompositePreview();
+        });
+
+        function updateInkColor(hex) {
+            state.inkColorHex = hex;
+            const n = parseInt(hex.replace('#', ''), 16);
+            state.inkColorRGB = { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+            document.getElementById('pickerInkColor').value = hex;
+            document.querySelectorAll('.ink-swatch').forEach(b => {
+                const match = b.dataset.ink.toLowerCase() === hex.toLowerCase();
+                b.classList.toggle('ring-2', match);
+                b.classList.toggle('ring-white', match);
+                b.classList.toggle('opacity-75', !match);
+            });
+            processStampCleaning();
+            renderCompositePreview();
+        }
+        document.querySelectorAll('.ink-swatch').forEach(b => {
+            b.addEventListener('click', () => updateInkColor(b.dataset.ink));
+        });
+        document.getElementById('pickerInkColor').addEventListener('input', (e) => updateInkColor(e.target.value));
+
+        document.getElementById('btnResetClean').addEventListener('click', () => {
+            state.blueThreshold = 14;
+            state.cyanRecovery = 78;
+            state.despeckleSize = 22;
+            state.inkBoost = 1;
+            state.inkDensity = 165;
+            state.reconstructInk = true;
+            document.getElementById('sliderBlueThresh').value = 14;
+            document.getElementById('valBlueThresh').textContent = '14';
+            document.getElementById('sliderCyanRecover').value = 78;
+            document.getElementById('valCyanRecover').textContent = '78%';
+            document.getElementById('sliderDespeckle').value = 22;
+            document.getElementById('valDespeckle').textContent = '22 px';
+            document.getElementById('sliderInkBoost').value = 1;
+            document.getElementById('valInkBoost').textContent = '1 Lapis';
+            document.getElementById('sliderInkDensity').value = 165;
+            document.getElementById('valInkDensity').textContent = '165%';
+            document.getElementById('chkReconstructColor').checked = true;
+            updateInkColor('#0a369d');
+            showToast('Parameter pembersih stempel dikembalikan ke standar optimal');
+        });
+
+        // Panel D: Parameter "Lanjutan" untuk Edit Foto ke-2
+        function bindPhoto2Slider(id, valId, key, isFloat = false) {
+            const el = document.getElementById(id);
+            const vEl = document.getElementById(valId);
+            el.addEventListener('input', () => {
+                const val = parseFloat(el.value);
+                state.p2[key] = val;
+                vEl.textContent = isFloat ? val.toFixed(2) : val;
+                applyPhoto2AdvancedAdjustments();
+                if (state.autoHarmonize) analyzeUnderlyingPaperAndHarmonize();
+                renderCompositePreview();
+            });
+        }
+        bindPhoto2Slider('sliderP2Brightness', 'valP2Brightness', 'brightness');
+        bindPhoto2Slider('sliderP2Contrast', 'valP2Contrast', 'contrast');
+        bindPhoto2Slider('sliderP2Shadow', 'valP2Shadow', 'shadow');
+        bindPhoto2Slider('sliderP2Highlight', 'valP2Highlight', 'highlight');
+        bindPhoto2Slider('sliderP2Gamma', 'valP2Gamma', 'gamma', true);
+        bindPhoto2Slider('sliderP2Saturation', 'valP2Saturation', 'saturation');
+
+        document.getElementById('btnResetPhoto2Params').addEventListener('click', () => {
+            state.p2 = { brightness: 0, contrast: 0, shadow: 0, highlight: 0, gamma: 1.00, saturation: 0 };
+            document.getElementById('sliderP2Brightness').value = 0;
+            document.getElementById('valP2Brightness').textContent = '0';
+            document.getElementById('sliderP2Contrast').value = 0;
+            document.getElementById('valP2Contrast').textContent = '0';
+            document.getElementById('sliderP2Shadow').value = 0;
+            document.getElementById('valP2Shadow').textContent = '0';
+            document.getElementById('sliderP2Highlight').value = 0;
+            document.getElementById('valP2Highlight').textContent = '0';
+            document.getElementById('sliderP2Gamma').value = 1.00;
+            document.getElementById('valP2Gamma').textContent = '1.00';
+            document.getElementById('sliderP2Saturation').value = 0;
+            document.getElementById('valP2Saturation').textContent = '0';
+            applyPhoto2AdvancedAdjustments();
+            analyzeUnderlyingPaperAndHarmonize();
+            renderCompositePreview();
+            showToast('Parameter lanjutan Foto ke-2 direset');
+        });
+
+        // ============================================================================
+        // LANGKAH 4: EKSPOR KE GAMBAR JPG, PNG, DAN PDF CETAK (CLIENT-SIDE PDF GENERATOR)
+        // ============================================================================
+        function buildCleanFinalCanvas() {
+            const w = photo2EditedCanvas.width;
+            const h = photo2EditedCanvas.height;
+            const outCanvas = document.createElement('canvas');
+            outCanvas.width = w;
+            outCanvas.height = h;
+            const outCtx = outCanvas.getContext('2d');
+
+            const prevSolo = state.soloStampMode;
+            state.soloStampMode = false;
+            renderCompositeToContext(outCtx, w, h, false); // false = tanpa garis bantu gizmo
+            state.soloStampMode = prevSolo;
+
+            return outCanvas;
+        }
+
+        function getExportBaseName() {
+            const raw = document.getElementById('inputExportName')?.value.trim();
+            return raw || 'hasil-komposisi-stempel';
+        }
+
+        function downloadFinalAsJPG() {
+            const finalCanvas = buildCleanFinalCanvas();
+            // Pastikan latar putih solid untuk JPG
+            const jpgCanvas = document.createElement('canvas');
+            jpgCanvas.width = finalCanvas.width;
+            jpgCanvas.height = finalCanvas.height;
+            const jCtx = jpgCanvas.getContext('2d');
+            jCtx.fillStyle = '#ffffff';
+            jCtx.fillRect(0, 0, jpgCanvas.width, jpgCanvas.height);
+            jCtx.drawImage(finalCanvas, 0, 0);
+
+            const name = `${getExportBaseName()}.jpg`;
+            const link = document.createElement('a');
+            link.download = name;
+            link.href = jpgCanvas.toDataURL('image/jpeg', 0.95);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`Berhasil mengunduh ${name}`);
+        }
+
+        function downloadFinalAsPNG() {
+            const finalCanvas = buildCleanFinalCanvas();
+            const name = `${getExportBaseName()}.png`;
+            const link = document.createElement('a');
+            link.download = name;
+            link.href = finalCanvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`Berhasil mengunduh ${name}`);
+        }
+
+        function downloadStampOnlyPNG() {
+            const name = `${getExportBaseName()}-stempel-transparan.png`;
+            const link = document.createElement('a');
+            link.download = name;
+            link.href = cleanedStampCanvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`Berhasil mengunduh stempel transparan ${name}`);
+        }
+
+        // Generator File PDF Cetak Mandiri (Membangun biner PDF 1.4 standar dengan gambar tersemat)
+        function downloadFinalAsPDF() {
+            const finalCanvas = buildCleanFinalCanvas();
+            const imgW = finalCanvas.width;
+            const imgH = finalCanvas.height;
+
+            // Buat JPEG data URL kualitas tinggi
+            const jpegDataUrl = finalCanvas.toDataURL('image/jpeg', 0.95);
+            const base64Data = jpegDataUrl.split(',')[1];
+            const binaryImg = atob(base64Data);
+            const imgByteLen = binaryImg.length;
+
+            // Ukuran halaman A4 dalam poin PDF (1 pt = 1/72 inch) disesuaikan orientasi gambar
+            const isLandscape = imgW >= imgH;
+            const pageW = isLandscape ? 841.89 : 595.28;
+            const pageH = isLandscape ? 595.28 : 841.89;
+            const margin = 28;
+
+            const scale = Math.min((pageW - margin * 2) / imgW, (pageH - margin * 2) / imgH);
+            const drawW = (imgW * scale).toFixed(2);
+            const drawH = (imgH * scale).toFixed(2);
+            const drawX = ((pageW - imgW * scale) / 2).toFixed(2);
+            const drawY = ((pageH - imgH * scale) / 2).toFixed(2);
+
+            const contentStream = `q\n${drawW} 0 0 ${drawH} ${drawX} ${drawY} cm\n/Im1 Do\nQ\n`;
+
+            const objects = [];
+            objects.push(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`);
+            objects.push(`2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n`);
+            objects.push(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+            const obj4Header = `4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgByteLen} >>\nstream\n`;
+            const obj4Footer = `\nendstream\nendobj\n`;
+            objects.push(null); // Placeholder untuk objek 4 (biner gambar)
+            objects.push(`5 0 obj\n<< /Length ${contentStream.length} >>\nstream\n${contentStream}\nendstream\nendobj\n`);
+
+            // Hitung total byte & susun Uint8Array untuk file PDF
+            const encoder = new TextEncoder();
+            const headerBytes = encoder.encode(`%PDF-1.4\n%\xFF\xFF\xFF\xFF\n`);
+
+            const chunks = [headerBytes];
+            const offsets = [0]; // index 0
+
+            let currentOffset = headerBytes.length;
+
+            for (let i = 0; i < objects.length; i++) {
+                offsets.push(currentOffset);
+                if (i === 3) {
+                    const hBytes = encoder.encode(obj4Header);
+                    const fBytes = encoder.encode(obj4Footer);
+                    const imgBytes = new Uint8Array(imgByteLen);
+                    for (let k = 0; k < imgByteLen; k++) {
+                        imgBytes[k] = binaryImg.charCodeAt(k);
+                    }
+                    chunks.push(hBytes, imgBytes, fBytes);
+                    currentOffset += hBytes.length + imgBytes.length + fBytes.length;
+                } else {
+                    const oBytes = encoder.encode(objects[i]);
+                    chunks.push(oBytes);
+                    currentOffset += oBytes.length;
+                }
+            }
+
+            const xrefOffset = currentOffset;
+            let xrefStr = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+            for (let i = 1; i <= objects.length; i++) {
+                xrefStr += String(offsets[i]).padStart(10, '0') + ` 00000 n \n`;
+            }
+            xrefStr += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+            chunks.push(encoder.encode(xrefStr));
+
+            const pdfBlob = new Blob(chunks, { type: 'application/pdf' });
+            const url = URL.createObjectURL(pdfBlob);
+            const name = `${getExportBaseName()}-cetak.pdf`;
+
+            const link = document.createElement('a');
+            link.download = name;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+            showToast(`Berhasil membuat & mengunduh PDF Cetak: ${name}`);
+        }
+
+        // Hubungkan Tombol Ekspor di Langkah 3 & Langkah 4
+        document.getElementById('btnExportJPG').addEventListener('click', downloadFinalAsJPG);
+        document.getElementById('btnExportPNG').addEventListener('click', downloadFinalAsPNG);
+        document.getElementById('btnExportPDF').addEventListener('click', downloadFinalAsPDF);
+
+        document.getElementById('btnStep4DownloadJPG').addEventListener('click', downloadFinalAsJPG);
+        document.getElementById('btnStep4DownloadPNG').addEventListener('click', downloadFinalAsPNG);
+        document.getElementById('btnStep4DownloadPDF').addEventListener('click', downloadFinalAsPDF);
+        document.getElementById('btnStep4DownloadStampOnlyPNG').addEventListener('click', downloadStampOnlyPNG);
+
+        // ============================================================================
+        // NAVIGASI ANTAR LANGKAH 1, 2, 3, DAN 4
+        // ============================================================================
+        function switchToStep(stepNum) {
+            state.currentStep = stepNum;
+
+            const s1 = document.getElementById('stepSection1');
+            const s2 = document.getElementById('stepSection2');
+            const s3 = document.getElementById('stepSection3');
+            const s4 = document.getElementById('stepSection4');
+
+            s1.classList.toggle('hidden', stepNum !== 1);
+            s2.classList.toggle('hidden', stepNum !== 2);
+            s3.classList.toggle('hidden', stepNum !== 3);
+            s4.classList.toggle('hidden', stepNum !== 4);
+
+            document.querySelectorAll('.step-tab-btn').forEach(btn => {
+                const n = parseInt(btn.dataset.stepNav, 10);
+                if (n === stepNum) {
+                    btn.classList.add('bg-blue-600', 'text-white', 'shadow');
+                    btn.classList.remove('text-slate-300');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            if (stepNum === 1) {
+                renderStep1Thumbnails();
+            } else if (stepNum === 2) {
+                executeCropFromPhoto1();
+                setTimeout(() => renderCropWorkspace(), 20);
+            } else if (stepNum === 3) {
+                executeCropFromPhoto1();
+                applyPhoto2AdvancedAdjustments();
+                analyzeUnderlyingPaperAndHarmonize();
+                setTimeout(() => fitCompositeViewport(), 20);
+            } else if (stepNum === 4) {
+                const cleanFinal = buildCleanFinalCanvas();
+                finalExportPreviewCanvas.width = cleanFinal.width;
+                finalExportPreviewCanvas.height = cleanFinal.height;
+                finalExportPreviewCanvas.getContext('2d').drawImage(cleanFinal, 0, 0);
+            }
+        }
+
+        document.querySelectorAll('.step-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchToStep(parseInt(btn.dataset.stepNav, 10)));
+        });
+
+        document.getElementById('btnGoStep2From1').addEventListener('click', () => switchToStep(2));
+        document.getElementById('btnApplyCropToStep3').addEventListener('click', () => {
+            switchToStep(3);
+            showToast('Potongan stempel Foto 1 otomatis dimasukkan ke Preview Foto 2!');
+        });
+        document.getElementById('btnApplyCropToStep3Side').addEventListener('click', () => {
+            switchToStep(3);
+            showToast('Potongan stempel Foto 1 otomatis dimasukkan ke Preview Foto 2!');
+        });
+        document.getElementById('btnBackToStep3').addEventListener('click', () => switchToStep(3));
+
+        document.getElementById('btnReloadDemo').addEventListener('click', () => {
+            generateDemoPhotos();
+            switchToStep(state.currentStep);
+            showToast('Sampel demo Foto 1 & Foto 2 berhasil dimuat ulang!');
+        });
+
+        // Toast Helper & Window Resize
+        let toastTimeout = null;
+        function showToast(msg) {
+            const box = document.getElementById('toastBox');
+            document.getElementById('toastMessage').textContent = msg;
+            box.classList.remove('opacity-0', 'translate-y-2');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                box.classList.add('opacity-0', 'translate-y-2');
+            }, 2800);
+        }
+
+        window.addEventListener('resize', () => {
+            if (state.currentStep === 2) renderCropWorkspace();
+            if (state.currentStep === 3) renderCompositePreview();
+        });
+
+        // Inisialisasi saat halaman dibuka
+        window.onload = function () {
+            generateDemoPhotos();
+            switchToStep(1);
+        };
+    </script>
+</body>
+</html>
